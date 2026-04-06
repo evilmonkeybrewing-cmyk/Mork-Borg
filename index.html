@@ -1,0 +1,1701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MÖRK BORG — GM SCREEN</title>
+<link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Special+Elite&family=Oswald:wght@300;400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --yellow: #f5d800;
+    --yellow-dark: #c9a800;
+    --black: #0a0a0a;
+    --near-black: #111111;
+    --dark-red: #8b0000;
+    --blood: #cc1100;
+    --grey: #2a2a2a;
+    --light-grey: #888;
+    --off-white: #e8e0d0;
+    --pink: #ff2d78;
+    --gold: #d4a017;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--black);
+    color: var(--off-white);
+    font-family: 'Special Elite', cursive;
+    font-size: 13px;
+    line-height: 1.4;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse at 20% 80%, rgba(139,0,0,0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 20%, rgba(245,216,0,0.04) 0%, transparent 50%),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  }
+
+  /* HEADER */
+  header {
+    background: var(--yellow);
+    color: var(--black);
+    text-align: center;
+    padding: 18px 20px 14px;
+    position: relative;
+    overflow: hidden;
+    border-bottom: 4px solid var(--black);
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 8px,
+      rgba(0,0,0,0.06) 8px,
+      rgba(0,0,0,0.06) 16px
+    );
+  }
+  header h1 {
+    font-family: 'UnifrakturMaguntia', cursive;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    letter-spacing: 4px;
+    position: relative;
+    z-index: 1;
+    text-shadow: 3px 3px 0 rgba(0,0,0,0.25);
+  }
+  header p {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    letter-spacing: 8px;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    position: relative;
+    z-index: 1;
+    margin-top: 4px;
+    color: #333;
+  }
+
+  /* NAV TABS */
+  .tabs {
+    display: flex;
+    background: var(--near-black);
+    border-bottom: 2px solid var(--yellow);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab-btn {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 10px 18px;
+    border: none;
+    background: none;
+    color: var(--light-grey);
+    cursor: pointer;
+    white-space: nowrap;
+    border-right: 1px solid #222;
+    transition: all 0.2s;
+    position: relative;
+  }
+  .tab-btn:hover { color: var(--yellow); background: rgba(245,216,0,0.05); }
+  .tab-btn.active {
+    color: var(--black);
+    background: var(--yellow);
+    font-weight: 700;
+  }
+
+  /* PANELS */
+  .panel { display: none; padding: 16px; animation: fadeIn 0.3s ease; }
+  .panel.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+  /* GRID LAYOUTS */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+  .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 14px; }
+  .grid-auto { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+  @media (max-width: 900px) {
+    .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+  }
+
+  /* CARDS */
+  .card {
+    background: var(--near-black);
+    border: 1px solid #2a2a2a;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .card-title {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    font-size: 0.65rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    padding: 7px 12px;
+    background: var(--grey);
+    color: var(--yellow);
+    border-bottom: 1px solid #333;
+  }
+  .card-title.blood { background: var(--dark-red); color: var(--yellow); }
+  .card-title.yellow { background: var(--yellow); color: var(--black); }
+  .card-title.pink { background: var(--pink); color: var(--black); }
+  .card-body { padding: 10px 12px; }
+
+  /* TABLE STYLES */
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  th {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+    font-size: 0.6rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--yellow);
+    padding: 5px 8px;
+    border-bottom: 1px solid #333;
+    text-align: left;
+  }
+  td { padding: 4px 8px; border-bottom: 1px solid #1a1a1a; vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(245,216,0,0.04); }
+  .die { color: var(--yellow); font-family: 'Share Tech Mono', monospace; font-weight: bold; font-size: 11px; }
+  .val { font-family: 'Share Tech Mono', monospace; color: #aaa; font-size: 11px; }
+
+  /* ROLL RESULT BLOCKS */
+  .roll-item {
+    display: flex;
+    gap: 8px;
+    padding: 4px 0;
+    border-bottom: 1px solid #1a1a1a;
+    align-items: flex-start;
+  }
+  .roll-item:last-child { border-bottom: none; }
+  .roll-num {
+    font-family: 'Share Tech Mono', monospace;
+    color: var(--yellow);
+    font-weight: bold;
+    min-width: 26px;
+    font-size: 11px;
+    padding-top: 1px;
+  }
+  .roll-text { flex: 1; line-height: 1.35; }
+
+  /* STAT BLOCKS */
+  .stat-block {
+    border: 1px solid var(--dark-red);
+    padding: 8px 10px;
+    margin-bottom: 8px;
+    background: rgba(139,0,0,0.08);
+    border-radius: 2px;
+  }
+  .stat-name {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    color: var(--blood);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 0.75rem;
+    margin-bottom: 2px;
+  }
+  .stat-line { font-size: 11px; color: #bbb; margin-bottom: 2px; }
+  .stat-line b { color: var(--off-white); }
+  .stat-special { font-size: 11px; color: #aaa; font-style: italic; margin-top: 3px; padding-top: 3px; border-top: 1px solid #2a2a2a; }
+
+  /* ITEM LIST */
+  .item-list { columns: 2; column-gap: 12px; font-size: 11px; }
+  .item-list .roll-item { break-inside: avoid; }
+
+  /* POWER GRID */
+  .power-item {
+    border: 1px solid #2a2a2a;
+    padding: 7px 9px;
+    margin-bottom: 6px;
+    border-radius: 2px;
+    background: rgba(255,255,255,0.02);
+  }
+  .power-name {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+    font-size: 0.65rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--yellow);
+    margin-bottom: 2px;
+  }
+  .power-name.sacred { color: #7ecaff; }
+  .power-text { font-size: 11px; color: #bbb; line-height: 1.35; }
+
+  /* HIGHLIGHT BOXES */
+  .highlight {
+    background: var(--yellow);
+    color: var(--black);
+    padding: 8px 12px;
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+  .highlight.blood { background: var(--dark-red); color: var(--yellow); }
+  .highlight.pink { background: var(--pink); color: var(--black); }
+
+  /* DR SCALE */
+  .dr-scale {
+    display: flex;
+    gap: 0;
+    overflow: hidden;
+    border-radius: 2px;
+    margin-bottom: 8px;
+  }
+  .dr-item {
+    flex: 1;
+    text-align: center;
+    padding: 6px 4px;
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    font-size: 0.7rem;
+    border-right: 1px solid rgba(0,0,0,0.3);
+  }
+  .dr-item:last-child { border-right: none; }
+  .dr-item span { display: block; font-size: 0.55rem; font-weight: 400; opacity: 0.8; margin-top: 1px; }
+
+  /* WEAPON TABLE */
+  .weapon-row { display: flex; gap: 8px; padding: 4px 0; border-bottom: 1px solid #1a1a1a; font-size: 11px; }
+  .weapon-row:last-child { border-bottom: none; }
+  .w-die { width: 30px; color: var(--yellow); font-family: 'Share Tech Mono', monospace; font-weight: bold; }
+  .w-name { flex: 1; }
+  .w-cost { width: 40px; text-align: right; color: #888; font-family: 'Share Tech Mono', monospace; }
+
+  /* CONDITION BADGE */
+  .badge {
+    display: inline-block;
+    background: var(--grey);
+    color: var(--off-white);
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.6rem;
+    letter-spacing: 1px;
+    padding: 2px 6px;
+    border-radius: 2px;
+    margin: 2px;
+  }
+  .badge.yellow { background: var(--yellow); color: var(--black); }
+  .badge.red { background: var(--dark-red); color: var(--yellow); }
+  .badge.pink { background: var(--pink); color: var(--black); }
+
+  /* DIVIDERS */
+  .section-title {
+    font-family: 'UnifrakturMaguntia', cursive;
+    font-size: 1.1rem;
+    color: var(--yellow);
+    border-bottom: 1px solid #333;
+    padding-bottom: 4px;
+    margin-bottom: 10px;
+  }
+  .mini-title {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    font-size: 0.6rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--yellow);
+    margin-bottom: 6px;
+  }
+  .mini-title.blood { color: var(--blood); }
+  .mini-title.grey { color: var(--light-grey); }
+
+  /* TAGS FLOW */
+  .tags { display: flex; flex-wrap: wrap; gap: 4px; }
+
+  /* MORALE BOX */
+  .morale-grid { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; align-items: start; font-size: 11px; }
+  .morale-roll { font-family: 'Share Tech Mono', monospace; color: var(--yellow); font-weight: bold; }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--near-black); }
+  ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: #555; }
+
+  /* REACTION COLORS */
+  .r-kill { color: var(--blood); font-weight: bold; }
+  .r-angry { color: #ff6b35; }
+  .r-indiff { color: #aaa; }
+  .r-friend { color: #7ecaff; }
+  .r-help { color: #90ee90; }
+
+  /* BROKEN TABLE */
+  .broken-grid { display: grid; grid-template-columns: auto 1fr; gap: 3px 10px; font-size: 11px; }
+  .b-num { font-family: 'Share Tech Mono', monospace; color: var(--blood); font-weight: bold; }
+
+  /* ANIMATION */
+  @keyframes flicker {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.85; }
+  }
+  .flicker { animation: flicker 3s ease-in-out infinite; }
+
+  /* TWO-COL ITEM LIST */
+  .two-col { columns: 2; column-gap: 16px; }
+  .two-col .roll-item { break-inside: avoid; }
+  .three-col { columns: 3; column-gap: 12px; }
+  .three-col .roll-item { break-inside: avoid; }
+
+  /* NPC TRAIT GRID */
+  .trait-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+  .trait-item { padding: 3px 6px; font-size: 11px; border-bottom: 1px solid #1a1a1a; border-right: 1px solid #1a1a1a; }
+  .trait-item:nth-child(even) { border-right: none; }
+
+  /* ARMOR TABLE */
+  .armor-tier {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 5px 0;
+    border-bottom: 1px solid #1a1a1a;
+    font-size: 11px;
+  }
+  .armor-tier:last-child { border-bottom: none; }
+  .tier-num { width: 20px; color: var(--yellow); font-family: 'Share Tech Mono', monospace; font-weight: bold; }
+  .tier-name { flex: 1; }
+  .tier-mod { color: var(--blood); font-family: 'Share Tech Mono', monospace; font-weight: bold; width: 36px; text-align: right; }
+
+  .section-divider {
+    border: none;
+    border-top: 1px solid #252525;
+    margin: 12px 0;
+  }
+
+  /* ENCOUNTER SEVERITY */
+  .sev-row { display: flex; gap: 8px; margin-bottom: 6px; align-items: flex-start; }
+  .sev-label { font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 0.65rem; letter-spacing: 1px; min-width: 70px; padding: 3px 6px; text-align: center; }
+
+  /* CRIT / FUMBLE */
+  .big-result {
+    text-align: center;
+    padding: 10px;
+    border: 1px solid;
+    margin-bottom: 8px;
+  }
+  .big-result.crit { border-color: var(--yellow); background: rgba(245,216,0,0.07); }
+  .big-result.fumble { border-color: var(--blood); background: rgba(204,17,0,0.07); }
+  .big-result-title { font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 0.7rem; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 4px; }
+
+  /* TABS SCROLL HINT */
+  .tab-section-label {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 400;
+    font-size: 0.55rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #444;
+    padding: 10px 12px 10px 16px;
+    white-space: nowrap;
+    align-self: center;
+    border-right: 1px solid #222;
+  }
+
+  /* GOBLIN / MONSTER COLORS */
+  .monster-special { color: #ff9944; font-size: 11px; font-style: italic; }
+
+  footer {
+    text-align: center;
+    padding: 12px;
+    color: #333;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 2px;
+    border-top: 1px solid #1a1a1a;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Mörk Borg — GM Screen</h1>
+  <p>Death · Deviry · Strange, Forbidden Knowledge · Lost Souls · Cursed Treasure · Damnation</p>
+</header>
+
+<div class="tabs">
+  <span class="tab-section-label">◆</span>
+  <button class="tab-btn active" onclick="showPanel('combat')">⚔ Combat</button>
+  <button class="tab-btn" onclick="showPanel('rolls')">🎲 Rolls & Rules</button>
+  <button class="tab-btn" onclick="showPanel('monsters')">💀 Monsters</button>
+  <button class="tab-btn" onclick="showPanel('powers')">✦ Powers</button>
+  <button class="tab-btn" onclick="showPanel('equipment')">⚙ Equipment</button>
+  <button class="tab-btn" onclick="showPanel('travel')">🗺 Travel</button>
+  <button class="tab-btn" onclick="showPanel('npcs')">👤 NPCs & City</button>
+  <button class="tab-btn" onclick="showPanel('tables')">📜 Random Tables</button>
+  <button class="tab-btn" onclick="showPanel('classes')">☠ Classes</button>
+</div>
+
+<!-- ═══════════════════════════════ COMBAT ═══════════════════════════════ -->
+<div id="panel-combat" class="panel active">
+  <div class="grid-3">
+
+    <!-- DIFFICULTY RATINGS -->
+    <div class="card">
+      <div class="card-title yellow">⚔ Difficulty Ratings</div>
+      <div class="card-body">
+        <div class="dr-scale" style="margin-bottom:10px">
+          <div class="dr-item" style="background:#1a3a1a;color:#90ee90">6<span>trivial</span></div>
+          <div class="dr-item" style="background:#1a2a1a;color:#aaddaa">8<span>simple</span></div>
+          <div class="dr-item" style="background:#2a2a1a;color:#cccc88">10<span>normal</span></div>
+          <div class="dr-item" style="background:#2a1a1a;color:#ddaa77">12<span>hard</span></div>
+          <div class="dr-item" style="background:#351a1a;color:#ee8855">14<span>severe</span></div>
+          <div class="dr-item" style="background:#3a1010;color:#ff5533">16<span>brutal</span></div>
+          <div class="dr-item" style="background:#420a0a;color:#ff2200">18<span>nigh impossible</span></div>
+        </div>
+        <p style="font-size:11px;color:#888;font-style:italic">Roll 2d6 for reactions, d6 for initiative, d20 for most tests. Use d20 + attribute vs DR. Only roll when failure is interesting.</p>
+      </div>
+    </div>
+
+    <!-- COMBAT SEQUENCE -->
+    <div class="card">
+      <div class="card-title blood">Combat Flow</div>
+      <div class="card-body">
+        <div class="mini-title">Who Goes First?</div>
+        <div class="highlight" style="margin-bottom:8px">Roll d6 — 1–3 Enemies · 4–6 PCs · Reroll each round</div>
+        <div class="mini-title">Attack & Defence</div>
+        <p style="font-size:11px;margin-bottom:6px;">Attacker rolls d20 + Strength (melee) or Agility (ranged) vs enemy's <b>Defence DR</b>. Defender rolls d20 + Agility vs <b>Attack DR</b>.</p>
+        <div class="big-result crit">
+          <div class="big-result-title" style="color:var(--yellow)">✦ Critical Hit</div>
+          <div style="font-size:11px">PC takes ×2 damage, enemy's armor is reduced one tier</div>
+        </div>
+        <div class="big-result fumble">
+          <div class="big-result-title" style="color:var(--blood)">✗ Fumble</div>
+          <div style="font-size:11px">Weapon breaks or is lost — enemy gains a free attack</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WHERE DOES IT HURT -->
+    <div class="card">
+      <div class="card-title blood">Where Does It Hurt? (d20)</div>
+      <div class="card-body">
+        <div class="grid-2" style="gap:2px">
+          <div>
+            <div class="roll-item"><span class="roll-num">1</span><span class="roll-text">Forehead</span></div>
+            <div class="roll-item"><span class="roll-num">2</span><span class="roll-text">Nose</span></div>
+            <div class="roll-item"><span class="roll-num">3</span><span class="roll-text">Teeth</span></div>
+            <div class="roll-item"><span class="roll-num">4</span><span class="roll-text">Throat</span></div>
+            <div class="roll-item"><span class="roll-num">5</span><span class="roll-text">Collarbone</span></div>
+            <div class="roll-item"><span class="roll-num">6</span><span class="roll-text">Shoulder</span></div>
+            <div class="roll-item"><span class="roll-num">7</span><span class="roll-text">Arm</span></div>
+            <div class="roll-item"><span class="roll-num">8</span><span class="roll-text">Elbow</span></div>
+            <div class="roll-item"><span class="roll-num">9</span><span class="roll-text">Hand</span></div>
+            <div class="roll-item"><span class="roll-num">10</span><span class="roll-text">Finger(s)</span></div>
+          </div>
+          <div>
+            <div class="roll-item"><span class="roll-num">11</span><span class="roll-text">Chest</span></div>
+            <div class="roll-item"><span class="roll-num">12</span><span class="roll-text">Solar plexus</span></div>
+            <div class="roll-item"><span class="roll-num">13</span><span class="roll-text">Side</span></div>
+            <div class="roll-item"><span class="roll-num">14</span><span class="roll-text">Gut</span></div>
+            <div class="roll-item"><span class="roll-num">15</span><span class="roll-text">Crotch</span></div>
+            <div class="roll-item"><span class="roll-num">16</span><span class="roll-text">Thigh</span></div>
+            <div class="roll-item"><span class="roll-num">17</span><span class="roll-text">Knee</span></div>
+            <div class="roll-item"><span class="roll-num">18</span><span class="roll-text">Shinbone</span></div>
+            <div class="roll-item"><span class="roll-num">19</span><span class="roll-text">Foot</span></div>
+            <div class="roll-item"><span class="roll-num">20</span><span class="roll-text">Achilles tendon</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BROKEN / 0 HP -->
+    <div class="card">
+      <div class="card-title blood">💀 Broken (0 HP) — d4</div>
+      <div class="card-body">
+        <div class="broken-grid">
+          <span class="b-num">1</span><span>Fall unconscious for d4 rounds, awaken with d4 HP.</span>
+          <span class="b-num">2</span><span>d6: 1–5 Broken/severed limb. 6 Lost eye — can't act d4 rounds, then active with d4 HP.</span>
+          <span class="b-num">3</span><span><b>Haemorrhage</b> — death in d2 hours unless treated. Tests at DR16 first hour, DR18 last hour.</span>
+          <span class="b-num">4</span><span style="color:var(--blood);font-weight:bold">DEAD.</span>
+        </div>
+        <hr class="section-divider">
+        <div class="mini-title">Infection</div>
+        <p style="font-size:11px;color:#bbb">No healing when resting. d6 damage each day until treated.</p>
+      </div>
+    </div>
+
+    <!-- RESTING & HEALING -->
+    <div class="card">
+      <div class="card-title">🩹 Resting & Healing</div>
+      <div class="card-body">
+        <div class="roll-item"><span class="roll-num" style="min-width:90px;font-size:10px">Catch breath</span><span class="roll-text die">d4 HP</span></div>
+        <div class="roll-item"><span class="roll-num" style="min-width:90px;font-size:10px">Night's sleep</span><span class="roll-text die">d6 HP</span></div>
+        <hr class="section-divider">
+        <div class="mini-title">Morale — Roll 2d6 when:</div>
+        <p style="font-size:11px;color:#999;margin-bottom:6px">First ally falls, outnumbered, facing something terrifying.</p>
+        <div class="morale-grid">
+          <span class="morale-roll">2–3</span><span class="r-kill">Kill! Fight to the death</span>
+          <span class="morale-roll">4–6</span><span class="r-angry">Angered, press attack</span>
+          <span class="morale-roll">7–8</span><span class="r-indiff">Indifferent</span>
+          <span class="morale-roll">9–10</span><span class="r-friend">Almost friendly</span>
+          <span class="morale-roll">11–12</span><span class="r-help">Helpful</span>
+        </div>
+        <hr class="section-divider">
+        <div class="mini-title">Broken Morale — d6</div>
+        <div class="morale-grid">
+          <span class="morale-roll">1–3</span><span>Flees</span>
+          <span class="morale-roll">4–6</span><span>Surrenders</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- REACTION TABLE -->
+    <div class="card">
+      <div class="card-title">👁 Reaction (2d6)</div>
+      <div class="card-body">
+        <div class="roll-item"><span class="roll-num">2</span><span class="r-kill roll-text">Attacks immediately, relentlessly</span></div>
+        <div class="roll-item"><span class="roll-num">3–5</span><span class="r-angry roll-text">Hostile, may attack</span></div>
+        <div class="roll-item"><span class="roll-num">6–8</span><span class="r-indiff roll-text">Unfriendly, cautious</span></div>
+        <div class="roll-item"><span class="roll-num">9–11</span><span class="r-friend roll-text">Neutral, curious</span></div>
+        <div class="roll-item"><span class="roll-num">12</span><span class="r-help roll-text">Friendly, may assist</span></div>
+        <hr class="section-divider">
+        <div class="mini-title grey">Encounter Difficulty</div>
+        <div class="sev-row"><span class="sev-label badge">Sword Fodder</span><span style="font-size:11px;color:#aaa">HP 5, Morale 7, Leather −d2, Weapon d4–d6</span></div>
+        <div class="sev-row"><span class="sev-label badge yellow">Worthy Foe</span><span style="font-size:11px;color:#aaa">HP 8–15, Morale 8, varied armor, interesting abilities</span></div>
+        <div class="sev-row"><span class="sev-label badge red">Big Bad</span><span style="font-size:11px;color:#aaa">HP 20+, Morale –, heavy armor, fearsome powers</span></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ ROLLS & RULES ═══════════════════════════════ -->
+<div id="panel-rolls" class="panel">
+  <div class="grid-3">
+
+    <div class="card">
+      <div class="card-title yellow">Core Attributes</div>
+      <div class="card-body">
+        <div class="roll-item"><span class="roll-num" style="min-width:80px">Strength</span><span class="roll-text" style="font-size:11px">Melee attacks, feats of force, grappling, carrying</span></div>
+        <div class="roll-item"><span class="roll-num" style="min-width:80px">Agility</span><span class="roll-text" style="font-size:11px">Ranged attacks, defence, dodging, sneaking</span></div>
+        <div class="roll-item"><span class="roll-num" style="min-width:80px">Presence</span><span class="roll-text" style="font-size:11px">Powers, perception, social, morale</span></div>
+        <div class="roll-item"><span class="roll-num" style="min-width:80px">Toughness</span><span class="roll-text" style="font-size:11px">Enduring poison, disease, pain, fatigue</span></div>
+        <hr class="section-divider">
+        <div class="mini-title">Powers per Day</div>
+        <p style="font-size:11px;color:#bbb">Presence + d4 uses. Reroll daily. Pass DR12 Presence to wield — failure: d2 damage + dizzy 1 hour.</p>
+        <hr class="section-divider">
+        <div class="mini-title">Omens</div>
+        <p style="font-size:11px;color:#bbb">Spend to reroll any die. Regained at dawn. Miseries reduce them.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Armour Tiers</div>
+      <div class="card-body">
+        <div class="armor-tier"><span class="tier-num">0</span><span class="tier-name">No armour</span><span class="tier-mod">—</span></div>
+        <div class="armor-tier"><span class="tier-num">1</span><span class="tier-name">Gambeson / Light clothing</span><span class="tier-mod">−d2</span></div>
+        <div class="armor-tier"><span class="tier-num">2</span><span class="tier-name">Leather / Chain shirt</span><span class="tier-mod">−d4</span></div>
+        <div class="armor-tier"><span class="tier-num">3</span><span class="tier-name">Full chain / Scale</span><span class="tier-mod">−d6</span></div>
+        <div class="armor-tier"><span class="tier-num">4</span><span class="tier-name">Plate armour</span><span class="tier-mod">−d8</span></div>
+        <hr class="section-divider">
+        <div class="mini-title">Repair Armour</div>
+        <div class="roll-item"><span class="roll-num" style="font-size:10px;min-width:60px">Tier 1→2</span><span class="roll-text">25 silver</span></div>
+        <div class="roll-item"><span class="roll-num" style="font-size:10px;min-width:60px">Tier 2→3</span><span class="roll-text">40 silver</span></div>
+        <p style="font-size:10px;color:#666;margin-top:4px;font-style:italic">Cannot repair above original tier.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Inventory & Carry</div>
+      <div class="card-body">
+        <p style="font-size:11px;margin-bottom:6px;color:#bbb">Items carried are limited by common sense. A scroll occupies an entire inventory slot. Backpack holds 7 normal-sized items. Sack holds 10.</p>
+        <hr class="section-divider">
+        <div class="mini-title">Services & Bribes</div>
+        <div class="roll-item"><span class="roll-num" style="min-width:90px;font-size:10px">Night in hospice</span><span class="roll-text die">3s</span></div>
+        <div class="roll-item"><span class="roll-num" style="min-width:90px;font-size:10px">Drink</span><span class="roll-text die">1s</span></div>
+        <div class="roll-item"><span class="roll-num" style="min-width:90px;font-size:10px">Steady meal</span><span class="roll-text die">2s</span></div>
+        <div class="roll-item"><span class="roll-num" style="min-width:90px;font-size:10px">Bribe guard</span><span class="roll-text die">20–40s</span></div>
+        <div class="roll-item"><span class="roll-num" style="min-width:90px;font-size:10px">Bribe clerk</span><span class="roll-text die">30–60s</span></div>
+        <div class="roll-item"><span class="roll-num" style="min-width:90px;font-size:10px">Bribe rabble</span><span class="roll-text die">5–15s</span></div>
+        <hr class="section-divider">
+        <div class="mini-title">Animals</div>
+        <div class="roll-item"><span class="roll-num" style="min-width:90px;font-size:10px">Horse</span><span class="roll-text die">80s</span></div>
+        <div class="roll-item"><span class="roll-num" style="min-width:90px;font-size:10px">Mule</span><span class="roll-text die">10s</span></div>
+        <div class="roll-item"><span class="roll-num" style="min-width:90px;font-size:10px">Dog (trained)</span><span class="roll-text die">25s</span></div>
+        <div class="roll-item"><span class="roll-num" style="min-width:90px;font-size:10px">Rat (tame)</span><span class="roll-text die">8s</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title blood">Traps — Effect (d12)</div>
+      <div class="card-body">
+        <div class="roll-item"><span class="roll-num">1</span><span class="roll-text">Bile-yellow <b>poisonous gas</b> — Toughness DR18 or die, test every minute</span></div>
+        <div class="roll-item"><span class="roll-num">2</span><span class="roll-text"><b>Poisonous darts</b> from wall-holes — d2 damage, Toughness DR16 or die</span></div>
+        <div class="roll-item"><span class="roll-num">3</span><span class="roll-text"><b>Giant marble</b> from ceiling — Agility DR14 or die</span></div>
+        <div class="roll-item"><span class="roll-num">4</span><span class="roll-text">Hidden chamber releases a <b>cruel creature</b></span></div>
+        <div class="roll-item"><span class="roll-num">5</span><span class="roll-text"><b>Sharpened pole</b> from the side — odd d20 = d20 damage</span></div>
+        <div class="roll-item"><span class="roll-num">6</span><span class="roll-text"><b>Falling net</b>. Something approaches — Presence DR16 to escape</span></div>
+        <div class="roll-item"><span class="roll-num">7</span><span class="roll-text">A <b>Power</b> affects you (random scroll effect)</span></div>
+        <div class="roll-item"><span class="roll-num">8</span><span class="roll-text"><b>Pit opens</b> — 1-in-6 impalement (death), else d6 per 10 feet</span></div>
+        <div class="roll-item"><span class="roll-num">9</span><span class="roll-text">Doors lock, <b>room fills with water</b> — find a way out</span></div>
+        <div class="roll-item"><span class="roll-num">10</span><span class="roll-text"><b>Alarm</b> sounds, something awakens</span></div>
+        <div class="roll-item"><span class="roll-num">11</span><span class="roll-text"><b>Walls closing in</b> — 1-in-6 they get stuck</span></div>
+        <div class="roll-item"><span class="roll-num">12</span><span class="roll-text"><b>Burning oil</b> from ceiling cauldron — odd d20 = d12 damage</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Trap Triggers</div>
+      <div class="card-body">
+        <div class="tags">
+          <span class="badge">Not leaving in time</span>
+          <span class="badge">Wrong floor tile</span>
+          <span class="badge">Touching doorknob</span>
+          <span class="badge">Pushing a button</span>
+          <span class="badge">Turning the key</span>
+          <span class="badge">Foul inscription</span>
+          <span class="badge">Stealing a prize</span>
+          <span class="badge">Talking loudly</span>
+          <span class="badge">Taking a torch</span>
+          <span class="badge">Opening a box</span>
+          <span class="badge">Trip wire</span>
+          <span class="badge">Rattling weapons</span>
+          <span class="badge">Elixir in cursed room</span>
+          <span class="badge">Lighting lantern</span>
+        </div>
+        <hr class="section-divider">
+        <div class="mini-title">Who Built It? (d20 — selection)</div>
+        <div class="two-col" style="font-size:11px">
+          <div class="roll-item"><span class="roll-num">1</span><span>Slow grotesque</span></div>
+          <div class="roll-item"><span class="roll-num">3</span><span>Simple goblin</span></div>
+          <div class="roll-item"><span class="roll-num">4</span><span>Forgotten berserker king</span></div>
+          <div class="roll-item"><span class="roll-num">6</span><span>Bitter necromancer</span></div>
+          <div class="roll-item"><span class="roll-num">9</span><span>Slumbering daemon</span></div>
+          <div class="roll-item"><span class="roll-num">12</span><span>Cunning skeleton</span></div>
+          <div class="roll-item"><span class="roll-num">16</span><span>Mindless death-cultist</span></div>
+          <div class="roll-item"><span class="roll-num">19</span><span>Sadistic architect</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Weather (d12)</div>
+      <div class="card-body">
+        <div class="two-col">
+          <div class="roll-item"><span class="roll-num">1</span><span class="roll-text">Lifeless grey</span></div>
+          <div class="roll-item"><span class="roll-num">2</span><span class="roll-text">Hammering rain</span></div>
+          <div class="roll-item"><span class="roll-num">3</span><span class="roll-text">Piercing wind</span></div>
+          <div class="roll-item"><span class="roll-num">4</span><span class="roll-text">Deafening storm</span></div>
+          <div class="roll-item"><span class="roll-num">5</span><span class="roll-text">Black as night</span></div>
+          <div class="roll-item"><span class="roll-num">6</span><span class="roll-text">Dead quiet</span></div>
+          <div class="roll-item"><span class="roll-num">7</span><span class="roll-text">Cloudburst</span></div>
+          <div class="roll-item"><span class="roll-num">8</span><span class="roll-text">Soup-thick mist</span></div>
+          <div class="roll-item"><span class="roll-num">9</span><span class="roll-text">Crackling frost</span></div>
+          <div class="roll-item"><span class="roll-num">10</span><span class="roll-text">Irritating drizzle</span></div>
+          <div class="roll-item"><span class="roll-num">11</span><span class="roll-text">Roaring thunder</span></div>
+          <div class="roll-item"><span class="roll-num">12</span><span class="roll-text">Gravelike cold</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ MONSTERS ═══════════════════════════════ -->
+<div id="panel-monsters" class="panel">
+  <div class="grid-3">
+
+    <div class="card">
+      <div class="card-title blood">Monster Generator — Roll 3d12</div>
+      <div class="card-body">
+        <div class="mini-title">Table A — Appearance</div>
+        <div class="roll-item"><span class="roll-num">1</span><span>dragging one limb</span></div>
+        <div class="roll-item"><span class="roll-num">2</span><span>blood-caked fur, hissing</span></div>
+        <div class="roll-item"><span class="roll-num">3</span><span>it cuts like a knife</span></div>
+        <div class="roll-item"><span class="roll-num">4</span><span>over-endowed in tentacles</span></div>
+        <div class="roll-item"><span class="roll-num">5</span><span>shimmering as if unreal</span></div>
+        <div class="roll-item"><span class="roll-num">6</span><span>bleeding from every orifice</span></div>
+        <div class="roll-item"><span class="roll-num">7</span><span>radiating dizzying magnetism</span></div>
+        <div class="roll-item"><span class="roll-num">8</span><span>bent like a coat hanger</span></div>
+        <div class="roll-item"><span class="roll-num">9</span><span>filthy claws like swords</span></div>
+        <div class="roll-item"><span class="roll-num">10</span><span>winged and flapping</span></div>
+        <div class="roll-item"><span class="roll-num">11</span><span>distorted, walking on wrong limbs</span></div>
+        <div class="roll-item"><span class="roll-num">12</span><span>blood-shot eyes, clucking words</span></div>
+        <hr class="section-divider">
+        <div class="mini-title">Damage by Die</div>
+        <table>
+          <tr><th>Lowest d12</th><th>Damage Die</th><th>HP (×2 roll)</th></tr>
+          <tr><td>1–3</td><td class="die">d4</td><td class="val">2–8</td></tr>
+          <tr><td>4–5</td><td class="die">d6</td><td class="val">2–12</td></tr>
+          <tr><td>6–7</td><td class="die">d8</td><td class="val">2–16</td></tr>
+          <tr><td>8–10</td><td class="die">d10</td><td class="val">2–20</td></tr>
+          <tr><td>11–12</td><td class="die">d12</td><td class="val">2–24</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title blood">Monster Wants (d20)</div>
+      <div class="card-body">
+        <div class="roll-item"><span class="roll-num">1</span><span>Collect fresh body parts</span></div>
+        <div class="roll-item"><span class="roll-num">2</span><span>Devour every living thing it seizes</span></div>
+        <div class="roll-item"><span class="roll-num">3</span><span>Escape something worse (roll another)</span></div>
+        <div class="roll-item"><span class="roll-num">4</span><span>Revel in fear — mutilates rather than kills</span></div>
+        <div class="roll-item"><span class="roll-num">5</span><span>Find and rule fresh territory</span></div>
+        <div class="roll-item"><span class="roll-num">6</span><span>Praise its obscure god through combat</span></div>
+        <div class="roll-item"><span class="roll-num">7</span><span>Become one with another creature</span></div>
+        <div class="roll-item"><span class="roll-num">8</span><span>Make its way to SHE</span></div>
+        <div class="roll-item"><span class="roll-num">9</span><span>Die, but not alone</span></div>
+        <div class="roll-item"><span class="roll-num">10</span><span>Build a hoard of silver, iron & blood-steel</span></div>
+        <div class="roll-item"><span class="roll-num">11</span><span>Defend its territory</span></div>
+        <div class="roll-item"><span class="roll-num">12</span><span>Mate, birthing a wondrous new horror</span></div>
+        <div class="roll-item"><span class="roll-num">13</span><span>Enslave all it encounters</span></div>
+        <div class="roll-item"><span class="roll-num">14</span><span>Cover corridors with warm flayed skin</span></div>
+        <div class="roll-item"><span class="roll-num">15</span><span>Collect eyes to see Nechrubel</span></div>
+        <div class="roll-item"><span class="roll-num">16</span><span>Cook fresh meat in its ever-burning hearth</span></div>
+        <div class="roll-item"><span class="roll-num">17</span><span>Be sympathized with — reacts violently if not</span></div>
+        <div class="roll-item"><span class="roll-num">18</span><span>Make necklaces of fingers</span></div>
+        <div class="roll-item"><span class="roll-num">19</span><span>Build stitched-skin dolls stuffed with hair</span></div>
+        <div class="roll-item"><span class="roll-num">20</span><span>Permanently traumatize one survivor into insanity</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title blood">Terrible Traits (d20)</div>
+      <div class="card-body">
+        <div class="roll-item"><span class="roll-num">1</span><span>Sprays acid every other round — 2-in-6 reduces armor tier</span></div>
+        <div class="roll-item"><span class="roll-num">2–4</span><span>Can and will converse — tries to persuade PCs to assist</span></div>
+        <div class="roll-item"><span class="roll-num">5</span><span>Speaks and humiliates — −2 Presence for fight's duration</span></div>
+        <div class="roll-item"><span class="roll-num">6</span><span>Loves choking victims — −d4 HP/round, Agility DR10 to avoid</span></div>
+        <div class="roll-item"><span class="roll-num">7</span><span>Anti-arcane dimension — Powers do not work nearby</span></div>
+        <div class="roll-item"><span class="roll-num">8</span><span>Terrifyingly fast — Attacks and Defence are DR14</span></div>
+        <div class="roll-item"><span class="roll-num">9</span><span>Roll on this table every 3 rounds, then every 2, etc.</span></div>
+        <div class="roll-item"><span class="roll-num">10</span><span class="monster-special">Rare! Worth 200s alive, 150s severed head, 80s vial of blood</span></div>
+        <div class="roll-item"><span class="roll-num">11</span><span>Deadly spore mist — everyone rolls d20, dies on a 1</span></div>
+        <div class="roll-item"><span class="roll-num">12</span><span>Tumescent — explodes on death: d12 damage split among PCs</span></div>
+        <div class="roll-item"><span class="roll-num">13</span><span>Multiplies on exactly 1 damage — split creates weaker clone</span></div>
+        <div class="roll-item"><span class="roll-num">14</span><span>Petrifying Gaze/Breath/Sting — Presence DR10 or soul in statue</span></div>
+        <div class="roll-item"><span class="roll-num">15+</span><span style="color:#888;font-style:italic">Terrible, but not in a great way.</span></div>
+      </div>
+    </div>
+
+    <!-- STAT BLOCKS -->
+    <div class="card">
+      <div class="card-title blood">Key Monster Stats</div>
+      <div class="card-body">
+        <div class="stat-block">
+          <div class="stat-name">Rot Priest</div>
+          <div class="stat-line"><b>HP</b> 10 · <b>Morale</b> 8 · No armor</div>
+          <div class="stat-line">Devour: DR12 Strength or grappled → d8/round. Claws d6.</div>
+          <div class="stat-special">Rotting touch: those damaged don't heal until magical cure or 1 night a day away from ziggurat.</div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-name">Horn Beast</div>
+          <div class="stat-line"><b>HP</b> 8 · <b>Morale</b> — · Shifting bones −d4</div>
+          <div class="stat-line">Claws d6 · Attacks twice per round.</div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-name">Undead</div>
+          <div class="stat-line"><b>HP</b> 3 · <b>Morale</b> — · No armor</div>
+          <div class="stat-special">Will Not Die: stays dead 1 round, rises with 1 HP. Slow: always outrunnable. Grapple: DR12 Strength or held.</div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-name">Dread Akünh</div>
+          <div class="stat-line"><b>HP</b> 20 · <b>Morale</b> 11 · No armor</div>
+          <div class="stat-special">Death scream (DR12 Presence). Attacks twice — if both hit, devoured (DR14 Strength or die). Teleports. Separated heart — resurrects unless heart destroyed.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Hunting Beasts by Region (d6)</div>
+      <div class="card-body">
+        <div class="mini-title">Tveland</div>
+        <div class="roll-item"><span class="roll-num">1</span><span>Antideer (HP 7, Antlers d6) — eating one costs −1 Presence</span></div>
+        <div class="roll-item"><span class="roll-num">2</span><span>Flayed Vultures d8 (HP 3, Bite/Claws d4)</span></div>
+        <div class="roll-item"><span class="roll-num">5</span><span>Steppe Wolfe (HP 8, Bite d6) pack of d8</span></div>
+        <div class="roll-item"><span class="roll-num">6</span><span>Tusked Bison (HP 16, Tusks d8) — fighting one brings d4 more</span></div>
+        <hr class="section-divider">
+        <div class="mini-title">Sarkash</div>
+        <div class="roll-item"><span class="roll-num">2</span><span>Dredgehog (HP 14, Bite/Daggers d6) — miss = d4 self-damage</span></div>
+        <div class="roll-item"><span class="roll-num">4</span><span>Throat-Cutting Warbler (HP 1, Beak d10) — attacks DR14</span></div>
+        <div class="roll-item"><span class="roll-num">6</span><span>Howler Bear (HP 18, Claws d8) — wails like dying men</span></div>
+        <hr class="section-divider">
+        <div class="mini-title">Kergüs</div>
+        <div class="roll-item"><span class="roll-num">4</span><span>Megasloths (HP 30, Scythe-claws d10)</span></div>
+        <div class="roll-item"><span class="roll-num">5</span><span>Blubber Gull d8 — explodes for d8 damage when threatened</span></div>
+        <div class="roll-item"><span class="roll-num">6</span><span>False Seal (HP 22) — actually a seal-sized spider inside</span></div>
+        <hr class="section-divider">
+        <div class="mini-title">Bergen Chrypt</div>
+        <div class="roll-item"><span class="roll-num">2</span><span>Nephalix Monkeys d4 (HP 7) — DR8 or be flung off cliffs</span></div>
+        <div class="roll-item"><span class="roll-num">5</span><span>Überwolf (HP 18) — d6+ regular wolves follow</span></div>
+        <div class="roll-item"><span class="roll-num">6</span><span>Ragpie (HP 8) — embraces, d4/round until DR18 Str or dies</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Hunting Mishaps (d10)</div>
+      <div class="card-body">
+        <div class="roll-item"><span class="roll-num">1</span><span>Beast is infested with <b>exploding ticks</b></span></div>
+        <div class="roll-item"><span class="roll-num">2</span><span>Another hunting party is nearby</span></div>
+        <div class="roll-item"><span class="roll-num">3</span><span>Another predator lurks, ready to strike</span></div>
+        <div class="roll-item"><span class="roll-num">4</span><span>Scavengers followed the tired beast</span></div>
+        <div class="roll-item"><span class="roll-num">5</span><span>Beast is undead, controlled by a necromancer</span></div>
+        <div class="roll-item"><span class="roll-num">6</span><span>Beast's lair is nearby — more of its kind there</span></div>
+        <div class="roll-item"><span class="roll-num">7</span><span>Beast is sick, contagious, <b>not good to eat</b></span></div>
+        <div class="roll-item"><span class="roll-num">8</span><span>Beast belongs to an Earthbound mud shaman</span></div>
+        <div class="roll-item"><span class="roll-num">9</span><span>Beast is sacred — locals will know if it dies</span></div>
+        <div class="roll-item"><span class="roll-num">10</span><span>Hunt enters <b>poisonous thorns / glacier / ravine</b></span></div>
+        <hr class="section-divider">
+        <div class="mini-title">In the Belly of the Beast (d10)</div>
+        <div class="roll-item"><span class="roll-num">1</span><span>Priest's remains — maybe a scroll</span></div>
+        <div class="roll-item"><span class="roll-num">2</span><span>Long and angry flesh worm</span></div>
+        <div class="roll-item"><span class="roll-num">4</span><span>Sharp bone usable as weapon (2d4)</span></div>
+        <div class="roll-item"><span class="roll-num">5</span><span>Lich's skull with ruby eyes (25s each)</span></div>
+        <div class="roll-item"><span class="roll-num">6</span><span>d6 silver coins</span></div>
+        <div class="roll-item"><span class="roll-num">9</span><span>Hallucinogenic powder — Presence DR12 or −2 Pres 1hr, but talk to spirits</span></div>
+        <div class="roll-item"><span class="roll-num">10</span><span>Arcane rune femur — opens sealed doors, then turns to salt, cursing owner</span></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ POWERS ═══════════════════════════════ -->
+<div id="panel-powers" class="panel">
+  <div class="grid-2">
+
+    <div class="card">
+      <div class="card-title yellow">✦ Unclean Powers (Scrolls 1–10)</div>
+      <div class="card-body">
+        <div class="power-item"><div class="power-name">1 · Palms Open the Southern Gate</div><div class="power-text">A ball of fire hits d2 creatures, dealing d8 damage each.</div></div>
+        <div class="power-item"><div class="power-name">2 · Nine Violet Signs Unknot the Storm</div><div class="power-text">Produce d2 lightning bolts, each dealing d6 damage.</div></div>
+        <div class="power-item"><div class="power-name">3 · Te-Le-Kin-Esis</div><div class="power-text">Move an object up to d10×10 feet for d6 minutes.</div></div>
+        <div class="power-item"><div class="power-name">4 · Tongue of Eris</div><div class="power-text">A creature of your choice is confused for 10 minutes.</div></div>
+        <div class="power-item"><div class="power-name">5 · Lucy-Fire's Levitation</div><div class="power-text">Hover for Presence + d10 rounds.</div></div>
+        <div class="power-item"><div class="power-name">6 · Daemon of Capillaries</div><div class="power-text">One creature suffocates for d6 rounds, losing d4 HP per round.</div></div>
+        <div class="power-item"><div class="power-name">7 · Eyelid Blinds the Mind</div><div class="power-text">d4 creatures fall asleep for one hour unless they succeed DR14.</div></div>
+        <div class="power-item"><div class="power-name">8 · Metzhuotl Blind Your Eye</div><div class="power-text">A creature becomes invisible for d6 rounds or until it attacks/defends at DR6.</div></div>
+        <div class="power-item"><div class="power-name">9 · Roskoe's Consuming Glare</div><div class="power-text">d4 creatures lose d8 HP each.</div></div>
+        <div class="power-item"><div class="power-name">10 · Death</div><div class="power-text">All creatures within 30 feet lose a total of 4d10 HP.</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title" style="background:#1a2a3a;color:#7ecaff">☩ Sacred Powers</div>
+      <div class="card-body">
+        <div class="power-item"><div class="power-name sacred">1 · Grace of a Dead Saint</div><div class="power-text">d2 creatures regain d10 HP each.</div></div>
+        <div class="power-item"><div class="power-name sacred">2 · Whispers Pass the Gate</div><div class="power-text">Ask three questions to a deceased creature.</div></div>
+        <div class="power-item"><div class="power-name sacred">3 · Aegis of Sorrow</div><div class="power-text">A creature of your choice gains 2d6 extra HP for 10 rounds.</div></div>
+        <div class="power-item"><div class="power-name sacred">4 · Unmet Fate</div><div class="power-text">One creature dead no more than a week is awakened with terrible memories.</div></div>
+        <div class="power-item"><div class="power-name sacred">5 · Bestial Speech</div><div class="power-text">Speak with animals for d20 minutes.</div></div>
+        <div class="power-item"><div class="power-name sacred">6 · Enochian Syntax</div><div class="power-text">One creature blindly obeys a single command.</div></div>
+        <div class="power-item"><div class="power-name sacred">7 · Foul Psychopomp</div><div class="power-text">Summon d4 skeletons (1–3) or d4 zombies (4–6).</div></div>
+        <div class="power-item"><div class="power-name sacred">8 · False Dawn / Night's Chariot</div><div class="power-text">Light or pitch black for 3d10 minutes.</div></div>
+        <div class="power-item"><div class="power-name sacred">9 · Hermetic Step</div><div class="power-text">Find all traps in your path for 2d10 minutes.</div></div>
+        <div class="power-item"><div class="power-name sacred">10 · Grace for a Sinner</div><div class="power-text">A creature of your choice gets +d6 on one roll.</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title yellow">Tablets of Ochre Obscurity</div>
+      <div class="card-body">
+        <p style="font-size:11px;color:#888;margin-bottom:8px;font-style:italic">Sells for 100s. Counts as normal item. Breaks on fumble. Wielder needs Presence +3 or be Forlorn Philosopher.</p>
+        <div class="power-item"><div class="power-name">1 · Dream Theory</div><div class="power-text">Target doubts reality — attacking/defending it is DR−2 (DR+2 for affected PCs).</div></div>
+        <div class="power-item"><div class="power-name">2 · Total Matter Comprehension</div><div class="power-text">Mend or break any normal-sized item, including armor (tier up/down) and weapons.</div></div>
+        <div class="power-item"><div class="power-name">3 · Ping the Shared Subconscious</div><div class="power-text">Sense living creatures within 70 feet, even through walls.</div></div>
+        <div class="power-item"><div class="power-name">4 · Logical Prognostication</div><div class="power-text">Deduce traps/mechanisms within 30 feet, or Powers used within 60 feet.</div></div>
+        <div class="power-item"><div class="power-name">5 · Carno-Organic Speleophagy</div><div class="power-text">Transmogrify a child-sized rock into burnt chewy meat. Feeds d4 people.</div></div>
+        <div class="power-item"><div class="power-name">6 · Time-Locked Pneumotoxin</div><div class="power-text">Crushed powder: d6 damage to target, on 6 it chokes and dies. Tablet reappears each morning.</div></div>
+        <div class="power-item"><div class="power-name">7 · Induced Irrelevance</div><div class="power-text">Removes creature's essential meaning d4 rounds — enemies won't attack it even if attacked first.</div></div>
+        <div class="power-item"><div class="power-name">8 · Structural Cryocondensation</div><div class="power-text">Form a 15-foot ice bridge from air, or freeze all water within 150 feet.</div></div>
+        <div class="power-item"><div class="power-name">9 · Meta-Alchemy</div><div class="power-text">Transform a liquid: make 2 doses of poison; create The Loathing of Vulark (DR16 or jump from heights); transform poison to water/wine.</div></div>
+        <div class="power-item"><div class="power-name">10 · Memetic Cognitive Palpitation</div><div class="power-text">One creature dances madly for d4 rounds — cannot attack or defend.</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Tenebrous Reliquary — Cursed Items (d66, selection)</div>
+      <div class="card-body">
+        <div class="roll-item"><span class="roll-num">11</span><span><b>Mercy's Bane</b> — Spiked flail (d8), +d6 damage to surrendering enemies</span></div>
+        <div class="roll-item"><span class="roll-num">12</span><span><b>Opium Hook</b> — Gives ×2 HP as temp HP 2h. May cause addiction (Toughness DR10)</span></div>
+        <div class="roll-item"><span class="roll-num">13</span><span><b>Plasmatic Idol</b> — Bleed on it: odd = red poison; even = +2 to Agi/Str tests until rest</span></div>
+        <div class="roll-item"><span class="roll-num">14</span><span><b>Ripper's Blade</b> — Deals no damage but removes d4−1 Armor</span></div>
+        <div class="roll-item"><span class="roll-num">15</span><span><b>Roses of Winter</b> — Single petal numbs pain; can't be killed/broken for a few minutes</span></div>
+        <div class="roll-item"><span class="roll-num">21</span><span><b>Snort Dagger</b> — Killing a goblin breaks blade but frees the creature within</span></div>
+        <div class="roll-item"><span class="roll-num">25</span><span><b>Veil of Blood</b> — Tightens on enemy's head: d6/round; victims rise as blood-drenched skeletons</span></div>
+        <div class="roll-item"><span class="roll-num">31</span><span><b>Volt Thrower</b> — Javelin (d6). Crit = extra 2d10 lightning. Fumble = lightning hits you</span></div>
+        <div class="roll-item"><span class="roll-num">32</span><span><b>The War Starter</b> — Anyone who sees it tests Presence DR14 or attacks its wielder</span></div>
+        <div class="roll-item"><span class="roll-num">35</span><span><b>Dust of Paradise</b> — Inhale: Presence DR14 or lost in blissful visions d6 min (can't act)</span></div>
+        <div class="roll-item"><span class="roll-num">51</span><span><b>Chaos Blade</b> — Zweihänder 2d8. Max damage casts Power: Death</span></div>
+        <div class="roll-item"><span class="roll-num">52</span><span><b>Chains of Death</b> — Die wearing them: they drag your killer to another world</span></div>
+        <div class="roll-item"><span class="roll-num">55</span><span><b>Crown of Burning Stars</b> — Adds omens = Miseries transpired. Miseries now trigger on 1 &amp; 2</span></div>
+        <div class="roll-item"><span class="roll-num">56</span><span><b>Book of Oblivion</b> — Presence DR12: transfer a memory to the book. Failure: it takes more</span></div>
+        <div class="roll-item"><span class="roll-num">61</span><span><b>Antlers of Lightning</b> — Every scroll read: flip coin; Heads = Nine Violet Signs instead</span></div>
+        <div class="roll-item"><span class="roll-num">63</span><span><b>Black Candles</b> — Flame flickers toward greatest threat within 1 mile</span></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ EQUIPMENT ═══════════════════════════════ -->
+<div id="panel-equipment" class="panel">
+  <div class="grid-3">
+
+    <div class="card">
+      <div class="card-title yellow">⚔ Weapons</div>
+      <div class="card-body">
+        <div class="weapon-row"><span class="w-die">d4</span><span class="w-name">Knife</span><span class="w-cost">10s</span></div>
+        <div class="weapon-row"><span class="w-die">d4</span><span class="w-name">Shortbow</span><span class="w-cost">13s</span></div>
+        <div class="weapon-row"><span class="w-die">d4</span><span class="w-name">Shortsword</span><span class="w-cost">20s</span></div>
+        <div class="weapon-row"><span class="w-die">d4</span><span class="w-name">Sling</span><span class="w-cost">8s</span></div>
+        <div class="weapon-row"><span class="w-die">d4</span><span class="w-name">Staff</span><span class="w-cost">5s</span></div>
+        <div class="weapon-row"><span class="w-die">d2</span><span class="w-name">Whip</span><span class="w-cost">5s</span></div>
+        <div class="weapon-row"><span class="w-die">d4</span><span class="w-name">Femur</span><span class="w-cost">free</span></div>
+        <div class="weapon-row"><span class="w-die">d6</span><span class="w-name">Bow</span><span class="w-cost">25s</span></div>
+        <div class="weapon-row"><span class="w-die">d6</span><span class="w-name">Club</span><span class="w-cost">10s</span></div>
+        <div class="weapon-row"><span class="w-die">d6</span><span class="w-name">Handaxe</span><span class="w-cost">15s</span></div>
+        <div class="weapon-row"><span class="w-die">d6</span><span class="w-name">Mace</span><span class="w-cost">25s</span></div>
+        <div class="weapon-row"><span class="w-die">d6</span><span class="w-name">Sword</span><span class="w-cost">30s</span></div>
+        <div class="weapon-row"><span class="w-die">d6</span><span class="w-name">Warhammer</span><span class="w-cost">30s</span></div>
+        <div class="weapon-row"><span class="w-die">d8</span><span class="w-name">Battle Axe</span><span class="w-cost">35s</span></div>
+        <div class="weapon-row"><span class="w-die">d8</span><span class="w-name">Crossbow</span><span class="w-cost">40s</span></div>
+        <div class="weapon-row"><span class="w-die">d8</span><span class="w-name">Flail</span><span class="w-cost">35s</span></div>
+        <div class="weapon-row"><span class="w-die">d10</span><span class="w-name">Zweihänder</span><span class="w-cost">60s</span></div>
+        <hr class="section-divider">
+        <div class="weapon-row"><span class="w-die">—</span><span class="w-name">20 arrows</span><span class="w-cost">10s</span></div>
+        <div class="weapon-row"><span class="w-die">—</span><span class="w-name">10 bolts</span><span class="w-cost">10s</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🎒 Equipment & Gear</div>
+      <div class="card-body">
+        <table>
+          <tr><th>Item</th><th>Cost</th><th>Notes</th></tr>
+          <tr><td>Backpack</td><td class="die">6s</td><td class="val">7 items</td></tr>
+          <tr><td>Bear trap</td><td class="die">20s</td><td class="val">DR14 spot, d8 dmg</td></tr>
+          <tr><td>Caltrops</td><td class="die">7s</td><td class="val">d4+infection 1in6</td></tr>
+          <tr><td>Crowbar</td><td class="die">8s</td><td></td></tr>
+          <tr><td>Crucifix (silver)</td><td class="die">60s</td><td></td></tr>
+          <tr><td>Dried food</td><td class="die">1s</td><td class="val">1 day</td></tr>
+          <tr><td>Firesteel</td><td class="die">4s</td><td></td></tr>
+          <tr><td>Grappling hook</td><td class="die">12s</td><td></td></tr>
+          <tr><td>Lantern oil</td><td class="die">5s</td><td class="val">Pres + 6 hours</td></tr>
+          <tr><td>Lard</td><td class="die">5s</td><td class="val">5 meals</td></tr>
+          <tr><td>Lockpicks</td><td class="die">5s</td><td></td></tr>
+          <tr><td>Manacles</td><td class="die">10s</td><td></td></tr>
+          <tr><td>Medicine box</td><td class="die">15s</td><td class="val">+d6 HP, Pres+4 uses</td></tr>
+          <tr><td>Mirror</td><td class="die">15s</td><td></td></tr>
+          <tr><td>Oil lamp</td><td class="die">10s</td><td></td></tr>
+          <tr><td>Poison (black)</td><td class="die">20s</td><td class="val">DR14 or d6+blind</td></tr>
+          <tr><td>Poison (red)</td><td class="die">20s</td><td class="val">DR12 or d10</td></tr>
+          <tr><td>Rope (30')</td><td class="die">4s</td><td></td></tr>
+          <tr><td>Sack</td><td class="die">3s</td><td class="val">10 items</td></tr>
+          <tr><td>Small wagon</td><td class="die">25s</td><td></td></tr>
+          <tr><td>Tent</td><td class="die">12s</td><td></td></tr>
+          <tr><td>Torch</td><td class="die">2s</td><td></td></tr>
+          <tr><td>Toolbox</td><td class="die">20s</td><td class="val">nails, hammer, saw</td></tr>
+          <tr><td>Waterskin</td><td class="die">4s</td><td class="val">4 days</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title yellow">d100 Trinkets (selection)</div>
+      <div class="card-body">
+        <div class="two-col" style="font-size:11px">
+          <div class="roll-item"><span class="roll-num" style="min-width:22px">01</span><span>A few bad apples</span></div>
+          <div class="roll-item"><span class="roll-num" style="min-width:22px">06</span><span>Small blood-filled bottle</span></div>
+          <div class="roll-item"><span class="roll-num" style="min-width:22px">08</span><span>Broken porcelain doll</span></div>
+          <div class="roll-item"><span class="roll-num" style="min-width:22px">10</span><span>Dead black cat</span></div>
+          <div class="roll-item"><span class="roll-num" style="min-width:22px">12</span><span>Crimson hood and mask</span></div>
+          <div class="roll-item"><span class="roll-num" style="min-width:22px">13</span><span>Long noose</span></div>
+          <div class="roll-item"><span class="roll-num" style="min-width:22px">15</span><span>d8 glass marbles</span></div>
+          <div class="roll-item"><span class="roll-num" style="min-width:22px">17</span><span>Oil painting of hooded skeleton</span></div>
+          <div class="roll-item"><span class="roll-num" style="min-width:22px">22</span><span>Two eyes in a jar</span></div>
+          <div class="roll-item"><span class="roll-num" style="min-width:22px">25</span><span>Latrine bucket</span></div>
+          <div class="roll-item"><span class="roll-num" style="min-width:22px">27</span><span>Horned helmet</span></div>
+          <div class="roll-item"><span class="roll-num" style="min-width:22px">29</span><span>Sad chicken in a cage</span></div>
+          <div class="roll-item"><span class="roll-num" style="min-width:22px">32</span><span>Scythe, recently sharpened (d8)</span></div>
+          <div class="roll-item"><span class="roll-num" style="min-width:22px">36</span><span>Purse with d10 silver</span></div>
+          <div class="roll-item"><span class="roll-num" style="min-width:22px">39</span><span>Gilded skull (d20+10s)</span></div>
+          <div class="roll-item"><span class="roll-num" style="min-width:22px">43</span><span>Stuffed magpie</span></div>
+          <div class="roll-item"><span class="roll-num" style="min-width:22px">47</span><span>Mousetrap (1 damage)</span></div>
+          <div class="roll-item"><span class="roll-num" style="min-width:22px">49</span><span>Linen sack with body parts</span></div>
+          <div class="roll-item"><span class="roll-num" style="min-width:22px">54</span><span>Chain mail, torso still in it</span></div>
+          <div class="roll-item"><span class="roll-num" style="min-width:22px">59</span><span>Flayed human skin</span></div>
+          <div class="roll-item"><span class="roll-num" style="min-width:22px">63</span><span>d4 gold teeth (10s each)</span></div>
+          <div class="roll-item"><span class="roll-num" style="min-width:22px">67</span><span>Bloody drill</span></div>
+          <div class="roll-item"><span class="roll-num" style="min-width:22px">69</span><span>Bird-billed mask</span></div>
+          <div class="roll-item"><span class="roll-num" style="min-width:22px">72</span><span>Quite fancy eye patch</span></div>
+          <div class="roll-item"><span class="roll-num" style="min-width:22px">74</span><span>Ball and chain (and a foot)</span></div>
+          <div class="roll-item"><span class="roll-num" style="min-width:22px">82</span><span>Wooden dentures</span></div>
+          <div class="roll-item"><span class="roll-num" style="min-width:22px">87</span><span>Jar with 3 severed thumbs</span></div>
+          <div class="roll-item"><span class="roll-num" style="min-width:22px">89</span><span>Thumbscrew</span></div>
+          <div class="roll-item"><span class="roll-num" style="min-width:22px">93</span><span>Half a treasure map</span></div>
+          <div class="roll-item"><span class="roll-num" style="min-width:22px">94</span><span>Bottle of red poison</span></div>
+          <div class="roll-item"><span class="roll-num" style="min-width:22px">97</span><span>Black sack with a cat's heart</span></div>
+          <div class="roll-item"><span class="roll-num" style="min-width:22px">00</span><span>Child-sized iron maiden</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ TRAVEL ═══════════════════════════════ -->
+<div id="panel-travel" class="panel">
+  <div class="grid-3">
+
+    <div class="card">
+      <div class="card-title">🗺 Travel Distances (Days)</div>
+      <div class="card-body">
+        <table>
+          <tr><th>From → To</th><th>Days</th></tr>
+          <tr><td>Alliáns → Galgenbeck</td><td class="die">d10+10</td></tr>
+          <tr><td>Alliáns → Graven-Tosk</td><td class="die">d8+6</td></tr>
+          <tr><td>Galgenbeck → Mûr</td><td class="die">d6+6</td></tr>
+          <tr><td>Galgenbeck → Grift</td><td class="die">d6+4</td></tr>
+          <tr><td>Galgenbeck → Bergen Chrypt</td><td class="die">d6+5</td></tr>
+          <tr><td>Galgenbeck → Schleswig</td><td class="die">d6+4</td></tr>
+          <tr><td>Galgenbeck → Valley of Undead</td><td class="die">d8+2</td></tr>
+          <tr><td>Schleswig → Bergen Chrypt</td><td class="die">d10+8</td></tr>
+          <tr><td>Schleswig → southeast coast</td><td class="die">d12+12</td></tr>
+          <tr><td>Valley → Bergen Chrypt</td><td class="die">d8+2</td></tr>
+        </table>
+        <hr class="section-divider">
+        <p style="font-size:11px;color:#888"><b>Smaller world:</b> halve modifier + drop die. <b>Larger:</b> double everything. <b>Bad weather:</b> double travel time.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title blood">Events by the Road (d20 daily)</div>
+      <div class="card-body">
+        <div class="roll-item"><span class="roll-num">1–3</span><span>Nothing. The world is grey.</span></div>
+        <div class="roll-item"><span class="roll-num">4</span><span>Weather worsens — no progress made</span></div>
+        <div class="roll-item"><span class="roll-num">5–6</span><span>Weather change — roll on weather table</span></div>
+        <div class="roll-item"><span class="roll-num">7–8</span><span>Road forks — signs unintelligible. Reroll.</span></div>
+        <div class="roll-item"><span class="roll-num">9</span><span>d6 rations of food or water spoil</span></div>
+        <div class="roll-item"><span class="roll-num">10</span><span><i>Monastery beside the road — monks are Nechrubel cultists</i></span></div>
+        <div class="roll-item"><span class="roll-num">11</span><span><i>Castle ruins — savage crows, blind alchemist in tower</i></span></div>
+        <div class="roll-item"><span class="roll-num">12</span><span><i>Religious procession of flagellants seeking HIM</i></span></div>
+        <div class="roll-item"><span class="roll-num">13</span><span>Filthy farmers heading to market</span></div>
+        <div class="roll-item"><span class="roll-num">14</span><span>d6+1 slavers with 2d6 slaves</span></div>
+        <div class="roll-item"><span class="roll-num">15</span><span>Mercenaries + d8 guards (all brain-parasite infected)</span></div>
+        <div class="roll-item"><span class="roll-num">16</span><span><i>Battle between flayed cultists and Earthbound pack</i></span></div>
+        <div class="roll-item"><span class="roll-num">17</span><span>Troll Adnah ambushes you</span></div>
+        <div class="roll-item"><span class="roll-num">18</span><span><i>Abandoned graveyard — gold cross 50s, d8 zombies in crypt</i></span></div>
+        <div class="roll-item"><span class="roll-num">19</span><span><i>Funerary procession — very large coffin, giant inside is dreaming</i></span></div>
+        <div class="roll-item"><span class="roll-num">20</span><span>Two roadside corpses — one has something in pockets (roll Corpse table)</span></div>
+        <p style="font-size:10px;color:#555;margin-top:6px;font-style:italic">Italicized results: cross out and replace with your own.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Night Camp Events (d12)</div>
+      <div class="card-body">
+        <div class="roll-item"><span class="roll-num">1–5</span><span>Quiet night. For once.</span></div>
+        <div class="roll-item"><span class="roll-num">6</span><span>Wild beast steals d4 rations — highest Presence tests DR12 to notice</span></div>
+        <div class="roll-item"><span class="roll-num">7</span><span>Everyone dreams of tomorrow's first encounter (roll now)</span></div>
+        <div class="roll-item"><span class="roll-num">8</span><span>Lurking coward steals from d3 PCs — Presence DR14 to notice</span></div>
+        <div class="roll-item"><span class="roll-num">9</span><span>Green terrible moon — all PCs have one less omen next day</span></div>
+        <div class="roll-item"><span class="roll-num">10</span><span>All dream (d6): black stars / snow plains / charnel houses / sterile hospitals / primeval forest / bright white nothingness — d6−3 omens next day</span></div>
+        <div class="roll-item"><span class="roll-num">11</span><span><i>Blind albino cultists pass, chanting to alligator goddess</i></span></div>
+        <div class="roll-item"><span class="roll-num">12</span><span>d4+2 peddlers with sooty lanterns — really robbers</span></div>
+        <hr class="section-divider">
+        <div class="mini-title">Off-Road Encounters (d12)</div>
+        <div class="roll-item"><span class="roll-num">1</span><span>Petrified forest</span></div>
+        <div class="roll-item"><span class="roll-num">2</span><span>Ancient battlefield — half-buried rusty blades and wraiths</span></div>
+        <div class="roll-item"><span class="roll-num">4</span><span>Pre-human god's lichen-covered temple</span></div>
+        <div class="roll-item"><span class="roll-num">5</span><span>Entrance to the deeper underworld</span></div>
+        <div class="roll-item"><span class="roll-num">7</span><span>Goblin-infested hills</span></div>
+        <div class="roll-item"><span class="roll-num">8</span><span><i>Ruined abbey — grotesque guards it, occult artifact in crypt</i></span></div>
+        <div class="roll-item"><span class="roll-num">9</span><span><i>Hallucinogenic pumpkin patch — fiercely guarded at night</i></span></div>
+        <div class="roll-item"><span class="roll-num">12</span><span><i>Vast bog — ruled by huge tentacled thing claiming royalty</i></span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Foraging (d6)</div>
+      <div class="card-body">
+        <div class="roll-item"><span class="roll-num">1</span><span>You get lost — spend the day finding the road</span></div>
+        <div class="roll-item"><span class="roll-num">2</span><span>Find d6+1 rations — one is spoiled (Presence DR12 to notice before eating)</span></div>
+        <div class="roll-item"><span class="roll-num">3</span><span>Find d6+3 rations of good food or fresh water</span></div>
+        <div class="roll-item"><span class="roll-num">4</span><span>Track a savage beast — kill it for d8+2 rations</span></div>
+        <div class="roll-item"><span class="roll-num">5–6</span><span>Find a village — roll on village table</span></div>
+        <hr class="section-divider">
+        <div class="mini-title">The Village Is (d6)</div>
+        <div class="roll-item"><span class="roll-num">1</span><span>Deserted — d6 rations can be scavenged</span></div>
+        <div class="roll-item"><span class="roll-num">2</span><span>Plague-stricken — 2-in-6 rations are tainted</span></div>
+        <div class="roll-item"><span class="roll-num">3</span><span>Well-off trading post — food and water plentiful, cheap</span></div>
+        <div class="roll-item"><span class="roll-num">4</span><span>Ruled by bandits — don't show wealth</span></div>
+        <div class="roll-item"><span class="roll-num">5</span><span>Spider cultists — no trading with outsiders</span></div>
+        <div class="roll-item"><span class="roll-num">6</span><span>Cannibals — no water for sale, plentiful "food"</span></div>
+        <hr class="section-divider">
+        <div class="mini-title">The Road Is (d8)</div>
+        <div class="roll-item"><span class="roll-num">1</span><span>Almost-forgotten dirt track</span></div>
+        <div class="roll-item"><span class="roll-num">2</span><span>Narrow wagon track, used by farmers</span></div>
+        <div class="roll-item"><span class="roll-num">3</span><span>Tracks of wild beasts or savage monsters</span></div>
+        <div class="roll-item"><span class="roll-num">4–5</span><span>Once-maintained trade road, now fallen</span></div>
+        <div class="roll-item"><span class="roll-num">6–7</span><span>Well-used road</span></div>
+        <div class="roll-item"><span class="roll-num">8</span><span>Paved road, sporadically patrolled by soldiers</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title blood">The Black Salt (d4 Wind Strength)</div>
+      <div class="card-body">
+        <table style="margin-bottom:8px">
+          <tr><th>Wind</th><th>Test (Toughness)</th></tr>
+          <tr><td>A weak vile gust</td><td class="die">DR 8</td></tr>
+          <tr><td>Sickly cursed salt-breeze</td><td class="die">DR 10</td></tr>
+          <tr><td>Terror-gale, sky blackens</td><td class="die">DR 14</td></tr>
+          <tr><td>Flesh-ripping hurricane</td><td class="die">DR 16</td></tr>
+        </table>
+        <div class="mini-title">Salt-Suffering Consequences (d12)</div>
+        <div class="roll-item"><span class="roll-num">1</span><span>Eyes burn, black tears, salt crust — Presence &amp; Agility −2 for d4 hours</span></div>
+        <div class="roll-item"><span class="roll-num">2</span><span>Black rime in every orifice — Presence −2 for d2 days</span></div>
+        <div class="roll-item"><span class="roll-num">3</span><span style="color:var(--blood)">Flesh begins to melt — fatal in d4 hours without intervention</span></div>
+        <div class="roll-item"><span class="roll-num">4</span><span>Skin blisters with black boils — lose d6 HP</span></div>
+        <div class="roll-item"><span class="roll-num">5</span><span>Read doom-patterns in wind — refuse weapons for d2 days</span></div>
+        <div class="roll-item"><span class="roll-num">6</span><span>Maddened with rage — attacks DR8, +3 damage, defence DR18 for a day</span></div>
+        <div class="roll-item"><span class="roll-num">7</span><span>Traumatized — 1-in-6 chance won't fight or hide from now on</span></div>
+        <div class="roll-item"><span class="roll-num">8</span><span>Black Salt Hand — believe hand is a foot, resist correction</span></div>
+        <div class="roll-item"><span class="roll-num">9</span><span>Black Salt Bloat — everything tastes of salt, can't sleep, d4 HP/day for d4 days</span></div>
+        <div class="roll-item"><span class="roll-num">10</span><span>Brutal soot cough — perish in d2 weeks without cure</span></div>
+        <div class="roll-item"><span class="roll-num">11</span><span>Old Salt Madness — d6: 1–4 make enemies of everyone, 5–6 befriend every creature</span></div>
+        <div class="roll-item"><span class="roll-num">12</span><span style="color:var(--blood);font-weight:bold">YOU CHOKE. PAINFUL DEATH.</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Travel Checklist</div>
+      <div class="card-body">
+        <div class="tags" style="margin-bottom:10px">
+          <span class="badge yellow">Track food &amp; water</span>
+          <span class="badge yellow">Calendar of Nechrubel daily</span>
+          <span class="badge yellow">Roll weather</span>
+          <span class="badge yellow">Events by road daily (d20)</span>
+          <span class="badge yellow">Camp events (d12)</span>
+        </div>
+        <p style="font-size:11px;color:#888;font-style:italic">Information in parentheses = not clear at first glance.</p>
+        <hr class="section-divider">
+        <div class="mini-title">The Death Ziggurat — Key Locations</div>
+        <div class="roll-item"><span style="font-size:10px;color:var(--blood);min-width:120px;display:inline-block">Rotting Mouth</span><span style="font-size:11px">Opens only when blood is dripped on it</span></div>
+        <div class="roll-item"><span style="font-size:10px;color:var(--blood);min-width:120px;display:inline-block">Priest Camp</span><span style="font-size:11px">d4+2 rot priests in conical tents</span></div>
+        <div class="roll-item"><span style="font-size:10px;color:var(--blood);min-width:120px;display:inline-block">Frozen Lake</span><span style="font-size:11px">Ice flowers (d6 effects) + trapped undead</span></div>
+        <div class="roll-item"><span style="font-size:10px;color:var(--blood);min-width:120px;display:inline-block">Spiral Chapel</span><span style="font-size:11px">Spiral Crown hidden beneath floor</span></div>
+        <div class="roll-item"><span style="font-size:10px;color:var(--blood);min-width:120px;display:inline-block">Ziggurat</span><span style="font-size:11px">Requires rot priest medallion — in Death Realm</span></div>
+        <div class="roll-item"><span style="font-size:10px;color:var(--blood);min-width:120px;display:inline-block">Akünh's Heart</span><span style="font-size:11px">10m below maw — destroy to banish demon (triggers Misery)</span></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ NPCs & CITY ═══════════════════════════════ -->
+<div id="panel-npcs" class="panel">
+  <div class="grid-3">
+
+    <div class="card">
+      <div class="card-title yellow">NPC Generator</div>
+      <div class="card-body">
+        <div class="mini-title">Trait (d36)</div>
+        <div class="three-col" style="font-size:11px;margin-bottom:8px">
+          <div class="roll-item"><span class="roll-num">1</span><span>Annoyed</span></div>
+          <div class="roll-item"><span class="roll-num">2</span><span>Sick</span></div>
+          <div class="roll-item"><span class="roll-num">3</span><span>Nervous</span></div>
+          <div class="roll-item"><span class="roll-num">4</span><span>Bleeding</span></div>
+          <div class="roll-item"><span class="roll-num">5</span><span>Aggressive</span></div>
+          <div class="roll-item"><span class="roll-num">6</span><span>Limping</span></div>
+          <div class="roll-item"><span class="roll-num">7</span><span>Confused</span></div>
+          <div class="roll-item"><span class="roll-num">8</span><span>Blind</span></div>
+          <div class="roll-item"><span class="roll-num">9</span><span>Scared</span></div>
+          <div class="roll-item"><span class="roll-num">10</span><span>Scarred</span></div>
+          <div class="roll-item"><span class="roll-num">11</span><span>Deaf</span></div>
+          <div class="roll-item"><span class="roll-num">12</span><span>Envious</span></div>
+          <div class="roll-item"><span class="roll-num">13</span><span>Rotting</span></div>
+          <div class="roll-item"><span class="roll-num">14</span><span>Sad</span></div>
+          <div class="roll-item"><span class="roll-num">15</span><span>Itching</span></div>
+          <div class="roll-item"><span class="roll-num">16</span><span>Desperate</span></div>
+          <div class="roll-item"><span class="roll-num">17</span><span>Stinking</span></div>
+          <div class="roll-item"><span class="roll-num">18</span><span>Pompous</span></div>
+          <div class="roll-item"><span class="roll-num">19</span><span>Dying</span></div>
+          <div class="roll-item"><span class="roll-num">20</span><span>Bitter</span></div>
+          <div class="roll-item"><span class="roll-num">21</span><span>Starving</span></div>
+          <div class="roll-item"><span class="roll-num">22</span><span>Gullible</span></div>
+          <div class="roll-item"><span class="roll-num">23</span><span>Pained</span></div>
+          <div class="roll-item"><span class="roll-num">24</span><span>Lazy</span></div>
+          <div class="roll-item"><span class="roll-num">25</span><span>Wounded</span></div>
+          <div class="roll-item"><span class="roll-num">26</span><span>Naïve</span></div>
+          <div class="roll-item"><span class="roll-num">27</span><span>Exhausted</span></div>
+          <div class="roll-item"><span class="roll-num">28</span><span>Gaudy</span></div>
+          <div class="roll-item"><span class="roll-num">29</span><span>Heretical</span></div>
+          <div class="roll-item"><span class="roll-num">30</span><span>Worried</span></div>
+          <div class="roll-item"><span class="roll-num">31</span><span>Hopeless</span></div>
+          <div class="roll-item"><span class="roll-num">32</span><span>Apathetic</span></div>
+          <div class="roll-item"><span class="roll-num">33</span><span>Drunk</span></div>
+          <div class="roll-item"><span class="roll-num">34</span><span>Gaunt</span></div>
+          <div class="roll-item"><span class="roll-num">35</span><span>Betrayed</span></div>
+          <div class="roll-item"><span class="roll-num">36</span><span>Thieving</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">NPC Trade & Wants</div>
+      <div class="card-body">
+        <div class="mini-title">Trade (d36, selection)</div>
+        <div class="two-col" style="font-size:11px;margin-bottom:8px">
+          <div class="roll-item"><span class="roll-num">1</span><span>Baker/Butcher</span></div>
+          <div class="roll-item"><span class="roll-num">2</span><span>Gravedigger</span></div>
+          <div class="roll-item"><span class="roll-num">3</span><span>Peddler/Drifter</span></div>
+          <div class="roll-item"><span class="roll-num">4</span><span>Soothsayer</span></div>
+          <div class="roll-item"><span class="roll-num">5</span><span>Snake breeder</span></div>
+          <div class="roll-item"><span class="roll-num">6</span><span>Blacksmith</span></div>
+          <div class="roll-item"><span class="roll-num">7</span><span>Executioner</span></div>
+          <div class="roll-item"><span class="roll-num">8</span><span>Innkeeper</span></div>
+          <div class="roll-item"><span class="roll-num">9</span><span>Peasant</span></div>
+          <div class="roll-item"><span class="roll-num">10</span><span>Icon painter</span></div>
+          <div class="roll-item"><span class="roll-num">11</span><span>Brigand/Thief</span></div>
+          <div class="roll-item"><span class="roll-num">12</span><span>Deserter</span></div>
+          <div class="roll-item"><span class="roll-num">13</span><span>Herbalist</span></div>
+          <div class="roll-item"><span class="roll-num">14</span><span>Lawless scum</span></div>
+          <div class="roll-item"><span class="roll-num">15</span><span>Former hermit</span></div>
+          <div class="roll-item"><span class="roll-num">16</span><span>Priest/Priestess</span></div>
+          <div class="roll-item"><span class="roll-num">17</span><span>Drudge/Dreg</span></div>
+          <div class="roll-item"><span class="roll-num">18</span><span>Struggling artisan</span></div>
+          <div class="roll-item"><span class="roll-num">19</span><span>Monkey tamer</span></div>
+          <div class="roll-item"><span class="roll-num">20</span><span>Bell ringer</span></div>
+          <div class="roll-item"><span class="roll-num">21</span><span>Shitshoveller</span></div>
+          <div class="roll-item"><span class="roll-num">22</span><span>Rat-catcher</span></div>
+          <div class="roll-item"><span class="roll-num">23</span><span>Mercenary</span></div>
+          <div class="roll-item"><span class="roll-num">24</span><span>Witch hunter</span></div>
+          <div class="roll-item"><span class="roll-num">25</span><span>Jailer/Torturer</span></div>
+          <div class="roll-item"><span class="roll-num">26</span><span>Bookbinder/Burner</span></div>
+          <div class="roll-item"><span class="roll-num">27</span><span>Tax collector</span></div>
+          <div class="roll-item"><span class="roll-num">28</span><span>Full-time gambler</span></div>
+          <div class="roll-item"><span class="roll-num">29</span><span>Seafarer</span></div>
+          <div class="roll-item"><span class="roll-num">30</span><span>Corpse collector</span></div>
+        </div>
+        <hr class="section-divider">
+        <div class="mini-title">Wants (d12)</div>
+        <div class="two-col" style="font-size:11px">
+          <div class="roll-item"><span class="roll-num">1</span><span>To travel</span></div>
+          <div class="roll-item"><span class="roll-num">2</span><span>Glorious death</span></div>
+          <div class="roll-item"><span class="roll-num">3</span><span>Bloodshed</span></div>
+          <div class="roll-item"><span class="roll-num">4</span><span>Forgiveness</span></div>
+          <div class="roll-item"><span class="roll-num">5</span><span>Revenge</span></div>
+          <div class="roll-item"><span class="roll-num">6</span><span>Treasure</span></div>
+          <div class="roll-item"><span class="roll-num">7</span><span>To retire</span></div>
+          <div class="roll-item"><span class="roll-num">8</span><span>Love</span></div>
+          <div class="roll-item"><span class="roll-num">9</span><span>A drink</span></div>
+          <div class="roll-item"><span class="roll-num">10</span><span>To be left alone</span></div>
+          <div class="roll-item"><span class="roll-num">11</span><span>Knowledge</span></div>
+          <div class="roll-item"><span class="roll-num">12</span><span>Some kind of meaning</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title yellow">NPC Secret & Concern</div>
+      <div class="card-body">
+        <div class="mini-title">Is Really… (d20)</div>
+        <div class="two-col" style="font-size:11px;margin-bottom:8px">
+          <div class="roll-item"><span class="roll-num">1</span><span>A spy</span></div>
+          <div class="roll-item"><span class="roll-num">2</span><span>An inquisitor</span></div>
+          <div class="roll-item"><span class="roll-num">3</span><span>Undead</span></div>
+          <div class="roll-item"><span class="roll-num">4</span><span>Reborn</span></div>
+          <div class="roll-item"><span class="roll-num">5</span><span>A necromancer</span></div>
+          <div class="roll-item"><span class="roll-num">6</span><span>Dying of plague</span></div>
+          <div class="roll-item"><span class="roll-num">7</span><span>An assassin</span></div>
+          <div class="roll-item"><span class="roll-num">8</span><span>A shapeshifter</span></div>
+          <div class="roll-item"><span class="roll-num">9</span><span>Desperate for money</span></div>
+          <div class="roll-item"><span class="roll-num">10</span><span>Filthy rich</span></div>
+          <div class="roll-item"><span class="roll-num">11</span><span>Full of insects</span></div>
+          <div class="roll-item"><span class="roll-num">12</span><span>A cannibal</span></div>
+          <div class="roll-item"><span class="roll-num">13</span><span>A serial killer</span></div>
+          <div class="roll-item"><span class="roll-num">14</span><span>Possessed by daemon</span></div>
+          <div class="roll-item"><span class="roll-num">15</span><span>A daemon</span></div>
+          <div class="roll-item"><span class="roll-num">16</span><span>Cursed</span></div>
+          <div class="roll-item"><span class="roll-num">17</span><span>A cultist</span></div>
+          <div class="roll-item"><span class="roll-num">18</span><span>Head of murder cult</span></div>
+          <div class="roll-item"><span class="roll-num">19</span><span>Disguised noble</span></div>
+          <div class="roll-item"><span class="roll-num">20</span><span>Just a mirage</span></div>
+        </div>
+        <hr class="section-divider">
+        <div class="mini-title">Concern (d12)</div>
+        <div class="roll-item"><span class="roll-num">1</span><span>Incredible debt</span></div>
+        <div class="roll-item"><span class="roll-num">2</span><span>Stolen goods</span></div>
+        <div class="roll-item"><span class="roll-num">3</span><span>Gang of ruffians</span></div>
+        <div class="roll-item"><span class="roll-num">4</span><span>Kidnapped kin</span></div>
+        <div class="roll-item"><span class="roll-num">5</span><span>A pool of blood</span></div>
+        <div class="roll-item"><span class="roll-num">6</span><span>Possessed spouse</span></div>
+        <div class="roll-item"><span class="roll-num">7</span><span>Family curse</span></div>
+        <div class="roll-item"><span class="roll-num">8</span><span>Murdered friend</span></div>
+        <div class="roll-item"><span class="roll-num">9</span><span>Weird wart</span></div>
+        <div class="roll-item"><span class="roll-num">10</span><span>Corrupt priests</span></div>
+        <div class="roll-item"><span class="roll-num">11</span><span>The world's end</span></div>
+        <div class="roll-item"><span class="roll-num">12</span><span>Muffled prisoner</span></div>
+      </div>
+    </div>
+
+    <!-- CITY EVENTS -->
+    <div class="card" style="grid-column: span 2">
+      <div class="card-title yellow">40 City Events (d4 + d10)</div>
+      <div class="card-body">
+        <div class="grid-2">
+          <div>
+            <div class="mini-title">d4 = 1</div>
+            <div class="roll-item"><span class="roll-num">1</span><span>Exhausted corpse-carter heading to graves with a full load</span></div>
+            <div class="roll-item"><span class="roll-num">2</span><span>d4 nobles promenading, beating people with gilded clubs</span></div>
+            <div class="roll-item"><span class="roll-num">3</span><span>Travelling weed-merchant asking directions to the Seer's</span></div>
+            <div class="roll-item"><span class="roll-num">4</span><span>Urchin painting <i>"LISTEN!"</i> with goat's blood on a wall</span></div>
+            <div class="roll-item"><span class="roll-num">5</span><span>Passing wastecart/barge. The stench is unbearable.</span></div>
+            <div class="roll-item"><span class="roll-num">6</span><span>Melancholic melodies from a broke, starving gutter bard</span></div>
+            <div class="roll-item"><span class="roll-num">7</span><span>Dead body in the street. Not even dogs care.</span></div>
+            <div class="roll-item"><span class="roll-num">8</span><span>Poor child crying in a corner. Lost, cold, alone.</span></div>
+            <div class="roll-item"><span class="roll-num">9</span><span>Sudden cacophony — a murder of crows</span></div>
+            <div class="roll-item"><span class="roll-num">10</span><span>Heavy rain. Streets cleared as people seek shelter.</span></div>
+            <hr class="section-divider">
+            <div class="mini-title">d4 = 2</div>
+            <div class="roll-item"><span class="roll-num">1</span><span>Fishmonger fending off stray cats</span></div>
+            <div class="roll-item"><span class="roll-num">2</span><span>Procession of masked flagellants, cursing and screaming</span></div>
+            <div class="roll-item"><span class="roll-num">3</span><span>Decadent acrobats, high and witless — nearly break their necks</span></div>
+            <div class="roll-item"><span class="roll-num">4</span><span>Family desperately rebuilding their burnt hovel</span></div>
+            <div class="roll-item"><span class="roll-num">5</span><span>Old man slumped against a wall, grabbing his heart</span></div>
+            <div class="roll-item"><span class="roll-num">6</span><span>Hopelessly depressed farmer stares at sky. Has lost everything.</span></div>
+            <div class="roll-item"><span class="roll-num">7</span><span>Heartbroken young fool seeking comfort in alley dregs</span></div>
+            <div class="roll-item"><span class="roll-num">8</span><span>Huge load of trash splashes down from a window</span></div>
+            <div class="roll-item"><span class="roll-num">9</span><span>Old woman in gutter — someone stole her crutch</span></div>
+            <div class="roll-item"><span class="roll-num">10</span><span>Drunken clerk falls. Scrolls and maps everywhere.</span></div>
+          </div>
+          <div>
+            <div class="mini-title">d4 = 3</div>
+            <div class="roll-item"><span class="roll-num">1</span><span>Rags-clad people fighting over bread. Guards are placing bets.</span></div>
+            <div class="roll-item"><span class="roll-num">2</span><span>Peglegged sailor bragging about the Angloarfish</span></div>
+            <div class="roll-item"><span class="roll-num">3</span><span>Laborers carrying a boat-sized casket to an anonymous priest</span></div>
+            <div class="roll-item"><span class="roll-num">4</span><span>Penniless carpenter trying to sell a worn crutch</span></div>
+            <div class="roll-item"><span class="roll-num">5</span><span>Patron violently ejected from pub — then robbed, then stabbed</span></div>
+            <div class="roll-item"><span class="roll-num">6</span><span>Chittering wave of a hundred rats across the street</span></div>
+            <div class="roll-item"><span class="roll-num">7</span><span>Group playing Three Dead Skulls with weighted dice</span></div>
+            <div class="roll-item"><span class="roll-num">8</span><span>Crossbow bolt hits a nearby door. Someone is practicing.</span></div>
+            <div class="roll-item"><span class="roll-num">9</span><span>Around the corner, a giant tree with a dozen hanged heretics</span></div>
+            <div class="roll-item"><span class="roll-num">10</span><span>Twenty people around a bonfire. <i>One is a Grift spy.</i></span></div>
+            <hr class="section-divider">
+            <div class="mini-title">d4 = 4</div>
+            <div class="roll-item"><span class="roll-num">1</span><span>People keeping distance from a rabid dog in the trash</span></div>
+            <div class="roll-item"><span class="roll-num">2</span><span>Three mercenaries dragging a dead troll across the street</span></div>
+            <div class="roll-item"><span class="roll-num">3</span><span>Severely hungover chaplain cursing the state of things</span></div>
+            <div class="roll-item"><span class="roll-num">4</span><span>Smell of dry snuff, herbs and hash from a crowded market</span></div>
+            <div class="roll-item"><span class="roll-num">5</span><span>Two monkeys eating what's left of a dead raven</span></div>
+            <div class="roll-item"><span class="roll-num">6</span><span>Explosion! Smoke and screams from a ruined alchemist's workshop</span></div>
+            <div class="roll-item"><span class="roll-num">7</span><span>Demagogue yelling about prophecy falsehood. Guards coming.</span></div>
+            <div class="roll-item"><span class="roll-num">8</span><span>Devastated, eyeless peasant in pillory. Begs for water.</span></div>
+            <div class="roll-item"><span class="roll-num">9</span><span>Well-used rusty guillotine being repaired and cleaned</span></div>
+            <div class="roll-item"><span class="roll-num">10</span><span>Occultist placing copper coins in intricate patterns</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INN -->
+    <div class="card">
+      <div class="card-title blood">Grey Galth Inn</div>
+      <div class="card-body">
+        <div class="mini-title">Why is the Innkeeper Twitching? (d10)</div>
+        <div class="roll-item"><span class="roll-num">1</span><span>Katleen "the Castrator" Keen hides in the loft</span></div>
+        <div class="roll-item"><span class="roll-num">2</span><span>Thinks you're the Lokr cult (the cult is already here)</span></div>
+        <div class="roll-item"><span class="roll-num">3</span><span>Three children from different families vanished silently</span></div>
+        <div class="roll-item"><span class="roll-num">4</span><span>Two-Headed Basilisks are hunting heathens</span></div>
+        <div class="roll-item"><span class="roll-num">5</span><span>Something gotten into everything — Toughness DR12 or lose d4 HP vomiting</span></div>
+        <div class="roll-item"><span class="roll-num">6</span><span>Jorat-Tug's gang was reanimated — too scared to tell them</span></div>
+        <div class="roll-item"><span class="roll-num">7</span><span>Old Man Agar exhibiting infectious ulcers — soon popping them</span></div>
+        <div class="roll-item"><span class="roll-num">8</span><span>One patron is clearly a disguised necromancer (they're all bad at it)</span></div>
+        <div class="roll-item"><span class="roll-num">9</span><span>Clear scratching from the cellar hatch. Everyone ignores it.</span></div>
+        <div class="roll-item"><span class="roll-num">10</span><span>Caged bird stopped singing. Started speaking prophecy.</span></div>
+        <hr class="section-divider">
+        <div class="mini-title">Patron Traits (d20)</div>
+        <div class="trait-grid" style="font-size:11px">
+          <div class="trait-item">Filth</div><div class="trait-item">Boozehound</div>
+          <div class="trait-item">One Eye</div><div class="trait-item">Gum Rot</div>
+          <div class="trait-item">Fancy Boy</div><div class="trait-item">Stinker</div>
+          <div class="trait-item">Braggard</div><div class="trait-item">Nosey</div>
+          <div class="trait-item">Hook Hand</div><div class="trait-item">Slurper</div>
+          <div class="trait-item">Aggro</div><div class="trait-item">Nags-a-lot</div>
+          <div class="trait-item">Archbishop of Mockery</div><div class="trait-item">Catastrophic Cough</div>
+          <div class="trait-item">Hysterical Tears</div><div class="trait-item">No Nose</div>
+          <div class="trait-item">Tongueless</div><div class="trait-item">Oily Boy</div>
+          <div class="trait-item">Trauma Dreams</div><div class="trait-item">Acid Face</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ RANDOM TABLES ═══════════════════════════════ -->
+<div id="panel-tables" class="panel">
+  <div class="grid-3">
+
+    <div class="card">
+      <div class="card-title yellow">Ruin Types (d10)</div>
+      <div class="card-body">
+        <div class="roll-item"><span class="roll-num">1</span><span>Unholy chapel</span></div>
+        <div class="roll-item"><span class="roll-num">2</span><span>Intact tower</span></div>
+        <div class="roll-item"><span class="roll-num">3</span><span>Cracked dome</span></div>
+        <div class="roll-item"><span class="roll-num">4</span><span>Underground shrine</span></div>
+        <div class="roll-item"><span class="roll-num">5</span><span>Fountain plaza</span></div>
+        <div class="roll-item"><span class="roll-num">6</span><span>Walled garden</span></div>
+        <div class="roll-item"><span class="roll-num">7</span><span>Black monolith</span></div>
+        <div class="roll-item"><span class="roll-num">8</span><span>Overgrown ziggurat</span></div>
+        <div class="roll-item"><span class="roll-num">9</span><span>Demon statuary</span></div>
+        <div class="roll-item"><span class="roll-num">10</span><span>Basalt mausoleum</span></div>
+        <hr class="section-divider">
+        <div class="mini-title">Searching a Ruin (15 min, d10)</div>
+        <div class="roll-item"><span class="roll-num">1</span><span>Feeling of being watched</span></div>
+        <div class="roll-item"><span class="roll-num">2</span><span>d3 frozen corpses</span></div>
+        <div class="roll-item"><span class="roll-num">3</span><span>As 2, one has minor treasure</span></div>
+        <div class="roll-item"><span class="roll-num">4</span><span>Trap! Agility test or d6 damage</span></div>
+        <div class="roll-item"><span class="roll-num">5</span><span>Fall into crypt — d3 damage</span></div>
+        <div class="roll-item"><span class="roll-num">6</span><span>Roll random event (d6)</span></div>
+        <div class="roll-item"><span class="roll-num">7</span><span>Roll random event (d10)</span></div>
+        <div class="roll-item"><span class="roll-num">8</span><span>Minor treasure in the open</span></div>
+        <div class="roll-item"><span class="roll-num">9</span><span>Minor treasure stashed away</span></div>
+        <div class="roll-item"><span class="roll-num">10</span><span>Major treasure!</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title yellow">Ruin Treasure</div>
+      <div class="card-body">
+        <div class="mini-title">Minor (d8) — worth 3d20 silver</div>
+        <div class="roll-item"><span class="roll-num">1</span><span>Blasphemous idol</span></div>
+        <div class="roll-item"><span class="roll-num">2</span><span>Charcoal black chalice</span></div>
+        <div class="roll-item"><span class="roll-num">3</span><span>Bracelet of teeth</span></div>
+        <div class="roll-item"><span class="roll-num">4</span><span>Curved ritual dagger</span></div>
+        <div class="roll-item"><span class="roll-num">5</span><span>Poisoned brooch</span></div>
+        <div class="roll-item"><span class="roll-num">6</span><span>Blood-stained coins</span></div>
+        <div class="roll-item"><span class="roll-num">7</span><span>Obsidian rod</span></div>
+        <div class="roll-item"><span class="roll-num">8</span><span>Iron devil mask</span></div>
+        <hr class="section-divider">
+        <div class="mini-title">Major (d6) — worth 30+2d20 silver</div>
+        <div class="roll-item"><span class="roll-num">1</span><span>Demonic figurine with eyes that seem to follow</span></div>
+        <div class="roll-item"><span class="roll-num">2</span><span>Void-black ring, heavier than it should be</span></div>
+        <div class="roll-item"><span class="roll-num">3</span><span>A handful of gemstones</span></div>
+        <div class="roll-item"><span class="roll-num">4</span><span>Mummified prophet's head</span></div>
+        <div class="roll-item"><span class="roll-num">5</span><span>Crystal ball</span></div>
+        <div class="roll-item"><span class="roll-num">6</span><span>Unclean scroll</span></div>
+        <hr class="section-divider">
+        <div class="mini-title">Ruin Random Events (d12)</div>
+        <div class="roll-item"><span class="roll-num">1–2</span><span>Nothing. Eerily quiet. Cold.</span></div>
+        <div class="roll-item"><span class="roll-num">3</span><span>Thunder roars as clouds pour into the fog</span></div>
+        <div class="roll-item"><span class="roll-num">4</span><span>Clouds part — colorful galaxy with growing black center</span></div>
+        <div class="roll-item"><span class="roll-num">5</span><span>Sudden arctic cold. Everything freezes.</span></div>
+        <div class="roll-item"><span class="roll-num">6</span><span>d6 moaning undead appear and attack</span></div>
+        <div class="roll-item"><span class="roll-num">7</span><span>d4 rot-priests approach carefully</span></div>
+        <div class="roll-item"><span class="roll-num">8</span><span>d4 confident rot-priests with 2 horn beasts</span></div>
+        <div class="roll-item"><span class="roll-num">11</span><span>Akünh, kneeling, resurrecting two corpses</span></div>
+        <div class="roll-item"><span class="roll-num">12</span><span>Akünh approaches — wants to know what you're doing here</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title blood">Ice Flower Effects (d6)</div>
+      <div class="card-body">
+        <p style="font-size:10px;color:#888;margin-bottom:6px;font-style:italic">Duration: H=1 Hour · W=1 Week · P=Permanent</p>
+        <div class="roll-item"><span class="roll-num">1</span><span><span class="badge">W</span> Visions of the death realm flicker at worst times</span></div>
+        <div class="roll-item"><span class="roll-num">2</span><span><span class="badge red">P</span> All hair turns white, skin the color of a bog mummy</span></div>
+        <div class="roll-item"><span class="roll-num">3</span><span><span class="badge yellow">H</span> Steals energy from Death's realm — max HP and undead damage +d6</span></div>
+        <div class="roll-item"><span class="roll-num">4</span><span><span class="badge red">P</span> In half an hour, turn into a sickly pale red-eyed ghoul. Can only taste human flesh.</span></div>
+        <div class="roll-item"><span class="roll-num">5</span><span><span class="badge red">P</span> Starts aging in reverse</span></div>
+        <div class="roll-item"><span class="roll-num">6</span><span><span class="badge">W</span> Wounds won't heal, attract larvae. Immune to rot priests' touch. Old people smell.</span></div>
+        <hr class="section-divider">
+        <div class="mini-title">Apocalypse Attitudes (d4)</div>
+        <div class="roll-item"><span class="roll-num">1</span><span>Best to accept it</span></div>
+        <div class="roll-item"><span class="roll-num">2</span><span>Someone will fix it</span></div>
+        <div class="roll-item"><span class="roll-num">3</span><span>About damn time</span></div>
+        <div class="roll-item"><span class="roll-num">4</span><span>We're doomed!</span></div>
+        <hr class="section-divider">
+        <div class="mini-title">NPC Names (selection)</div>
+        <div class="tags">
+          <span class="badge">Theras</span><span class="badge">Vagal</span><span class="badge">Skelh</span>
+          <span class="badge">Burder</span><span class="badge">Galt</span><span class="badge">Morgar</span>
+          <span class="badge">Gravuld</span><span class="badge">Krangel</span><span class="badge">Kluvrist</span>
+          <span class="badge">Mardul</span><span class="badge">Dölun</span><span class="badge">Vükkan</span>
+          <span class="badge">Loga</span><span class="badge">Drugel</span><span class="badge">Vrakh</span>
+          <span class="badge">Katla</span><span class="badge">Nagl</span><span class="badge">Svind</span>
+          <span class="badge">Keftar</span><span class="badge">Klort</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ CLASSES ═══════════════════════════════ -->
+<div id="panel-classes" class="panel">
+  <div class="grid-3">
+
+    <div class="card">
+      <div class="card-title blood">☠ Cursed Skinwalker</div>
+      <div class="card-body">
+        <p style="font-size:11px;color:#bbb;margin-bottom:6px;font-style:italic">You should have died. Your soul mingled with another. You live a shared existence — man and monster.</p>
+        <div class="mini-title">Abilities</div>
+        <p style="font-size:11px;color:#bbb;margin-bottom:6px">Presence: 3d6−2. Strength &amp; Toughness: 3d6+1. HP: Toughness + d8. Starts: 2d6×10s, d2 Omens.</p>
+        <div class="mini-title">Creature Shapes (d6)</div>
+        <div class="stat-block">
+          <div class="stat-name">1. Murder-Plagued Rat</div>
+          <div class="stat-line">Tiny: Agility/Defence DR8. Bite (d4) carries disease — DR14 or victim attacks nearest ally.</div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-name">2. Flayed and Dripping Wolf</div>
+          <div class="stat-line">Ferocious: attacks DR10. Fangs crit on natural 19. Slick from blood: −d2 damage.</div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-name">3. Boneskulled Raven</div>
+          <div class="stat-line">Fast &amp; flying: defence DR10, two claw (d4) attacks/round. Skull: −1 damage + ignore 1 attack.</div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-name">4. Bear from Bergen Chrypt</div>
+          <div class="stat-line">Str/Tough/attacks DR10. Defence DR14. Thick hide −d4. Claws/bite d8.</div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-name">5. Life-and-Death Lizard</div>
+          <div class="stat-line">Regenerate d4 HP/round. Bite (d6) or acid spit. Scales −d2.</div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-name">6. Doomsaying Monkey</div>
+          <div class="stat-line">Agility/Defence DR10. Light armor/weapons usable. Third eye: read scrolls at DR10.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title" style="background:#1a1a3a;color:#aaaaff">👁 Pale One</div>
+      <div class="card-body">
+        <p style="font-size:11px;color:#bbb;margin-bottom:6px;font-style:italic">An alien. You lurk on settlement fringes. Bouts of incoherent madness. You await the inevitable.</p>
+        <div class="mini-title">Abilities</div>
+        <p style="font-size:11px;color:#bbb;margin-bottom:6px">+1 Agility &amp; Presence. −2 Toughness. Literate in dead languages only. Cannot use scrolls. Intuitive Power (random, daily). HP: Toughness + d6. Starts: d6×10s, d4 Omens.</p>
+        <div class="mini-title">Blessings (d6)</div>
+        <div class="roll-item"><span class="roll-num">1</span><span><b>The Stars Were Right</b> — d4+2 omens. Say something cryptic when you use one.</span></div>
+        <div class="roll-item"><span class="roll-num">2</span><span><b>Membranous Wings</b> — short-distance flight, no armor. Birds hate you.</span></div>
+        <div class="roll-item"><span class="roll-num">3</span><span><b>Uncommon Clay</b> — nourished by soil, sickened by food. Smell of mushrooms.</span></div>
+        <div class="roll-item"><span class="roll-num">4</span><span><b>Mana from Somewhere</b> — spend Power use to create weirdly delicious food for d6.</span></div>
+        <div class="roll-item"><span class="roll-num">5</span><span><b>Digitigrade Limbs</b> — escape any bindings, fit through tiny spaces, −4 DR to flexibility.</span></div>
+        <div class="roll-item"><span class="roll-num">6</span><span><b>Too Many Eyes</b> — can't be surprised. Spend Power use to leave an eye behind to spy.</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title blood">Dead God's Prophet</div>
+      <div class="card-body">
+        <p style="font-size:11px;color:#bbb;margin-bottom:6px;font-style:italic">You are the prophet of a god slain by SHE. The voices — day and night. Like hot wires through your brain.</p>
+        <div class="mini-title">Abilities</div>
+        <p style="font-size:11px;color:#bbb;margin-bottom:6px">Presence: 3d6+2. Toughness: 3d6−2. Literate, uses scrolls — but must test Presence DR12 or try to destroy them. HP: Toughness + d4. Starts: d6×5s, d3 Omens. Two gifts from dead god (d8).</p>
+        <div class="mini-title">Two Gifts (d8)</div>
+        <div class="roll-item"><span class="roll-num">1</span><span><b>Blood Tells</b> — self-inflict d3 before combat for +2 to rolls per HP lost</span></div>
+        <div class="roll-item"><span class="roll-num">2</span><span><b>Lord of Nothing</b> — bizarre kingly garb: +2 to impress the easily fooled</span></div>
+        <div class="roll-item"><span class="roll-num">3</span><span><b>Smell of Decay</b> — +2 Defence from gut-wrenching stench</span></div>
+        <div class="roll-item"><span class="roll-num">4</span><span><b>Incoherent Sophistic Babble</b> — listeners must pass Presence DR10 or lose next action</span></div>
+        <div class="roll-item"><span class="roll-num">5</span><span><b>Ichor of Rot</b> — DR12 attack: wipe hands on bare skin, Toughness DR12 or spasm 2 turns</span></div>
+        <div class="roll-item"><span class="roll-num">6</span><span><b>My Body, a Vessel</b> — once/day: god enters, answer one yes/no question truthfully</span></div>
+        <div class="roll-item"><span class="roll-num">7</span><span><b>In Death I Live</b> — on death: Presence DR14 or recover with 1 HP instead</span></div>
+        <div class="roll-item"><span class="roll-num">8</span><span><b>Eyes of Holy Fire</b> — once/combat: attack (DR10) spurt fire from eyes (d6), then blinded</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title yellow">Forlorn Philosopher</div>
+      <div class="card-body">
+        <p style="font-size:11px;color:#bbb;margin-bottom:6px;font-style:italic">Cold analysis cannot tame Fate. The dream of reason has decayed to shifting madness.</p>
+        <div class="mini-title">Abilities</div>
+        <p style="font-size:11px;color:#bbb;margin-bottom:6px">Presence: 3d6+2. Strength: 3d6−2. Ruthless Inquisition: Presence DR14 to tear through deception. Literate, uses scrolls. Starts with 1 Tablet of Ochre Obscurity + 1 ability. HP: Toughness + d4. Starts: d6×10s, d4 Omens.</p>
+        <div class="mini-title">Starting Abilities (d6)</div>
+        <div class="roll-item"><span class="roll-num">1</span><span><b>Thorns of Comprehension</b> — pain crown (d2→d4→d6 damage) gives −4 DR to next test and ignore 2 attacks</span></div>
+        <div class="roll-item"><span class="roll-num">2</span><span><b>Hegelian Owl</b> — bitter philosophical beast (Presence DR12 to persuade). Fetches, attacks, finds traps.</span></div>
+        <div class="roll-item"><span class="roll-num">3</span><span><b>Prism of Ambiguity</b> — heal d6 HP to up to 2 creatures; one lowers DRs −2 for 1hr; twice/day</span></div>
+        <div class="roll-item"><span class="roll-num">4</span><span><b>Flute of Tosk</b> — once/combat when creature dies: echo fatal damage to random enemy</span></div>
+        <div class="roll-item"><span class="roll-num">5</span><span><b>Sash of the Stylite</b> — feel no hunger, need only water; wearing &gt;d4 days causes collapse</span></div>
+        <div class="roll-item"><span class="roll-num">6</span><span><b>Marked by Obscurity</b> — Ochre Tablet tattooed on flesh; roll each morning which one; auto-succeeds once/day</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Starting Class Summary</div>
+      <div class="card-body">
+        <table>
+          <tr><th>Class</th><th>HP</th><th>Silver</th><th>Omens</th><th>Special</th></tr>
+          <tr><td>Cursed Skinwalker</td><td class="die">Tough+d8</td><td class="val">2d6×10</td><td class="val">d2</td><td style="font-size:10px">Shapeshift</td></tr>
+          <tr><td>Pale One</td><td class="die">Tough+d6</td><td class="val">d6×10</td><td class="val">d4</td><td style="font-size:10px">Alien Power</td></tr>
+          <tr><td>Dead God's Prophet</td><td class="die">Tough+d4</td><td class="val">d6×5</td><td class="val">d3</td><td style="font-size:10px">2 Gifts</td></tr>
+          <tr><td>Forlorn Philosopher</td><td class="die">Tough+d4</td><td class="val">d6×10</td><td class="val">d4</td><td style="font-size:10px">Ochre Tablet</td></tr>
+        </table>
+        <hr class="section-divider">
+        <div class="mini-title">Common Class Starting Rules</div>
+        <div class="roll-item"><span class="roll-num" style="min-width:70px;font-size:10px">Weapon</span><span>Roll on weapon table (d6 or as specified)</span></div>
+        <div class="roll-item"><span class="roll-num" style="min-width:70px;font-size:10px">Armor</span><span>Roll on armor table (usually d2)</span></div>
+        <div class="roll-item"><span class="roll-num" style="min-width:70px;font-size:10px">Powers</span><span>Presence + d4 uses per day, DR12 to cast</span></div>
+        <hr class="section-divider">
+        <div class="mini-title">Typical Enemy Stat Blocks</div>
+        <div class="stat-block">
+          <div class="stat-name">Underpaid, Tired Guard</div>
+          <div class="stat-line">HP 5, Morale 7, Leather −d2, Weapon d4 or d6</div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-name">Weak, Mindless Undead</div>
+          <div class="stat-line">HP 4, Morale –, Rags, Fist d4 or Axe d6</div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-name">Anti-Arcane Lich Queen</div>
+          <div class="stat-line">HP 24, Morale –, Necro-field −d4, Okkült strike d8. Eats Powers.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title blood">First Died (d6) — Character Backstory</div>
+      <div class="card-body">
+        <div class="mini-title">Skinwalker</div>
+        <div class="roll-item"><span class="roll-num">1</span><span>Clutching a lover's body</span></div>
+        <div class="roll-item"><span class="roll-num">2</span><span>By an arrow in the brain</span></div>
+        <div class="roll-item"><span class="roll-num">3</span><span>Minutes after birth</span></div>
+        <div class="roll-item"><span class="roll-num">4</span><span>By a friend's hand</span></div>
+        <div class="roll-item"><span class="roll-num">5</span><span>Murdered in your bed</span></div>
+        <div class="roll-item"><span class="roll-num">6</span><span>On the back of a plague-cart</span></div>
+        <hr class="section-divider">
+        <div class="mini-title">Pale One — Unspoken Origins (d6)</div>
+        <div class="roll-item"><span class="roll-num">1</span><span>Caught by fishermen on the Endless Sea</span></div>
+        <div class="roll-item"><span class="roll-num">2</span><span>Accidentally summoned by cultists in Graven-Tosk</span></div>
+        <div class="roll-item"><span class="roll-num">3</span><span>Vomited by a foul beast in Bergen Chrypt</span></div>
+        <div class="roll-item"><span class="roll-num">4</span><span>Fell from the sky near Alliáns</span></div>
+        <div class="roll-item"><span class="roll-num">5</span><span>Hatched from a BogWitch egg in Wästland</span></div>
+        <div class="roll-item"><span class="roll-num">6</span><span>Crawled from a crack in the ground near Grift</span></div>
+        <hr class="section-divider">
+        <div class="mini-title">Philosopher — Roots of Dejection (d8)</div>
+        <div class="roll-item"><span class="roll-num">1</span><span>Mother alternated praise/humiliation — grandiose self-image and burning self-hatred</span></div>
+        <div class="roll-item"><span class="roll-num">2</span><span>Wanted to be a warrior — STOP THE THOUGHTS</span></div>
+        <div class="roll-item"><span class="roll-num">3</span><span>Ambient stupidity inflames hypersensitive mental tissues</span></div>
+        <div class="roll-item"><span class="roll-num">4</span><span>Could save the world — if only the masses understood your GENIUS</span></div>
+        <div class="roll-item"><span class="roll-num">5</span><span>Fell victim to "love" — object went to live in a hole</span></div>
+        <div class="roll-item"><span class="roll-num">6</span><span>Encoded omnivalent philosophy in single tome — watched it burn</span></div>
+        <div class="roll-item"><span class="roll-num">7</span><span>Cultists forced you to debate while devouring your parents alive</span></div>
+        <div class="roll-item"><span class="roll-num">8</span><span>Most revered philosopher of Südglans — which sank into the sea</span></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer>MÖRK BORG CULT: FERETORY · Ockult Örtmästare Games &amp; Stockholm Kartell · GM Reference Screen</footer>
+
+<script>
+function showPanel(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  event.currentTarget.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
