@@ -1,0 +1,690 @@
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Share+Tech+Mono&family=Oswald:wght@700&display=swap');
+
+*{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --black:#0a0808;--near-black:#111010;--dark:#1a1818;
+  --yellow:#f5e642;--yellow-dim:#c4b830;
+  --red:#c41a1a;--red-bright:#e82020;
+  --pink:#e8006a;
+  --white:#f0ede0;--off:#c8c5b0;--muted:#888070;
+  --border:rgba(245,230,66,0.15);--border-s:rgba(245,230,66,0.35);
+  --card:rgba(245,230,66,0.03);
+}
+
+html{background:var(--black);color:var(--white);font-family:'Share Tech Mono',monospace;font-size:12px;line-height:1.5}
+body{max-width:1280px;margin:0 auto;padding:8px}
+
+/* NOISE TEXTURE */
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:9998;opacity:0.5}
+
+@keyframes glitch{0%,93%,100%{transform:none;text-shadow:none}94%{transform:translateX(-3px);text-shadow:3px 0 var(--red)}96%{transform:translateX(2px);text-shadow:-3px 0 var(--yellow)}98%{transform:none}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+@keyframes bleed{0%,100%{opacity:.7}50%{opacity:1}}
+@keyframes fade{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:.4}50%{opacity:.9}}
+
+/* HEADER */
+.hdr{text-align:center;padding:8px 0 10px;border-bottom:3px solid var(--yellow);margin-bottom:8px;position:relative}
+.hdr::before{content:'✝ ✝ ✝';position:absolute;top:4px;left:8px;font-size:10px;color:var(--red);letter-spacing:6px;opacity:.6}
+.hdr::after{content:'✝ ✝ ✝';position:absolute;top:4px;right:8px;font-size:10px;color:var(--red);letter-spacing:6px;opacity:.6}
+.hdr h1{font-family:'UnifrakturMaguntia',serif;font-size:34px;color:var(--yellow);letter-spacing:3px;animation:glitch 10s ease-in-out infinite;line-height:1;text-shadow:0 0 30px rgba(245,230,66,0.2)}
+.hdr-sub{font-size:9.5px;color:var(--red);letter-spacing:2.5px;margin-top:3px;text-transform:uppercase}
+.hdr-tags{display:flex;gap:5px;justify-content:center;margin-top:5px;flex-wrap:wrap}
+.tag{font-size:9px;padding:2px 7px;letter-spacing:.8px;border:1px solid}
+.ty{border-color:var(--yellow);color:var(--yellow)}
+.tr{border-color:var(--red);color:var(--red)}
+.tw{border-color:var(--muted);color:var(--muted)}
+
+/* TABS */
+.tabs{display:flex;gap:3px;margin-bottom:7px;flex-wrap:wrap}
+.tb{font-family:'Oswald',sans-serif;font-size:10.5px;font-weight:700;letter-spacing:1.5px;padding:4px 9px;background:transparent;border:1px solid var(--muted);color:var(--muted);cursor:pointer;transition:all .12s;text-transform:uppercase}
+.tb:hover{border-color:var(--yellow);color:var(--yellow)}
+.tb.on{background:var(--yellow);border-color:var(--yellow);color:var(--black)}
+
+/* PANELS */
+.pnl{display:none}.pnl.on{display:block;animation:fade .2s ease both}
+
+/* GRID */
+.g{display:grid;gap:7px}
+.g2{grid-template-columns:1fr 1fr}
+.g3{grid-template-columns:1fr 1fr 1fr}
+.g4{grid-template-columns:1fr 1fr 1fr 1fr}
+
+/* CARD */
+.c{background:var(--card);border:1px solid var(--border);padding:7px 9px}
+.c-red{border-color:rgba(196,26,26,0.35)}
+.c-yellow{border-color:rgba(245,230,66,0.35)}
+
+.ch{font-family:'UnifrakturMaguntia',serif;font-size:14px;color:var(--yellow);border-bottom:1px solid var(--border);padding-bottom:3px;margin-bottom:5px;letter-spacing:.5px}
+.ch.r{color:var(--red)}
+.ch.w{color:var(--white)}
+
+/* ROWS */
+.rw{display:flex;justify-content:space-between;align-items:baseline;padding:2px 0;border-bottom:1px dashed rgba(255,255,255,0.05);gap:5px;font-size:11.5px}
+.rw:last-child{border-bottom:none}
+.rl{color:var(--yellow);flex-shrink:0;font-size:10.5px}
+.rv{color:var(--off);text-align:right;font-size:11px}
+
+/* WARN / INFO */
+.warn{background:rgba(196,26,26,.08);border:1px solid var(--red);border-left:3px solid var(--red);padding:4px 7px;font-size:11px;color:#ffaaaa;margin-top:4px;line-height:1.4}
+.warn strong{color:#ff6060}
+.info{background:rgba(245,230,66,.05);border:1px solid var(--border-s);border-left:3px solid var(--yellow);padding:4px 7px;font-size:11px;color:#cccc80;margin-top:4px;line-height:1.4}
+.info strong{color:var(--yellow)}
+
+/* DR TABLE */
+.dr{display:grid;grid-template-columns:auto 1fr;gap:1px 8px;margin-top:3px}
+.drn{color:var(--yellow);font-size:12px;font-weight:700}
+.drt{color:var(--off);font-size:11px}
+
+/* ABILITIES */
+.ab-g{display:grid;grid-template-columns:repeat(2,1fr);gap:3px;margin-top:3px}
+.ab{padding:4px 6px;border:1px solid var(--border);text-align:center}
+.abn{color:var(--yellow);font-family:'Oswald',sans-serif;font-size:10px;font-weight:700;letter-spacing:.5px;display:block;margin-bottom:1px}
+.abd{color:var(--muted);font-size:10px;line-height:1.25}
+
+/* ABILITY SCORE TABLE */
+.score-tbl{display:grid;grid-template-columns:auto auto auto;gap:1px 12px;margin-top:3px;font-size:11px}
+.sc-roll{color:var(--off)}
+.sc-mod{color:var(--yellow);font-weight:700;text-align:center}
+.sc-label{color:var(--muted);font-size:10px}
+
+/* BROKEN TABLE */
+.broken-g{display:grid;grid-template-columns:auto 1fr;gap:3px 8px;margin-top:3px}
+.bn{color:var(--red);font-weight:700;font-size:13px}
+.bt{color:var(--off);font-size:11px;line-height:1.3}
+
+/* CALENDAR */
+.cal-g{display:grid;grid-template-columns:1fr 1fr;gap:3px;margin-top:3px}
+.cal{padding:4px 6px;border:1px solid var(--border);font-size:11px}
+.cal-ref{color:var(--red);font-family:'Oswald',sans-serif;font-size:10px;font-weight:700;display:block;margin-bottom:1px}
+.cal-txt{color:var(--off);font-size:10.5px;line-height:1.3}
+.cal-final{border-color:var(--red);background:rgba(196,26,26,.08);grid-column:1/-1}
+
+/* BESTIARY */
+.beast-g{display:grid;grid-template-columns:repeat(3,1fr);gap:3px}
+.beast{padding:5px 6px;border:1px solid var(--border)}
+.bname{font-family:'Oswald',sans-serif;font-size:11.5px;font-weight:700;color:var(--yellow);display:block;margin-bottom:2px;letter-spacing:.5px}
+.bstats{display:flex;gap:3px;flex-wrap:wrap;margin-bottom:2px}
+.bs{font-size:10px;color:var(--yellow);background:rgba(245,230,66,.06);padding:1px 4px;border:1px solid rgba(245,230,66,.2)}
+.bs.r{color:#ff8888;background:rgba(196,26,26,.06);border-color:rgba(196,26,26,.2)}
+.bsp{color:var(--muted);font-size:10px;line-height:1.3;margin-top:1px}
+
+/* CLASS CARDS */
+.class-g{display:grid;grid-template-columns:repeat(3,1fr);gap:3px}
+.cc{padding:5px 7px;border:1px solid var(--border)}
+.ccn{font-family:'UnifrakturMaguntia',serif;font-size:13px;color:var(--yellow);display:block;margin-bottom:2px}
+.cca{color:var(--red);font-size:10.5px;display:block;margin-bottom:2px}
+.ccd{color:var(--off);font-size:10.5px;line-height:1.3}
+
+/* LOCATION CARDS */
+.loc-g{display:grid;grid-template-columns:repeat(3,1fr);gap:3px}
+.loc{padding:5px 7px;border:1px solid var(--border)}
+.locn{font-family:'UnifrakturMaguntia',serif;font-size:12px;color:var(--yellow);display:block;margin-bottom:2px}
+.loct{color:var(--red);font-size:10px;display:block;margin-bottom:1px;font-family:'Oswald',sans-serif;font-weight:700;letter-spacing:.5px}
+.locd{color:var(--off);font-size:10.5px;line-height:1.3}
+
+/* POWER TABLE */
+.pow-g{display:grid;grid-template-columns:auto 1fr;gap:2px 8px;margin-top:3px}
+.pn{color:var(--red);font-size:11px;font-weight:700}
+.pt{color:var(--off);font-size:11px;line-height:1.3}
+
+/* WEAPON TABLE */
+.wt{width:100%;border-collapse:collapse;font-size:11px;margin-top:3px}
+.wt th{color:var(--red);text-align:left;padding:2px 4px;border-bottom:1px solid rgba(196,26,26,.4);font-family:'Oswald',sans-serif;font-size:10px;font-weight:700;letter-spacing:.5px}
+.wt td{padding:2px 4px;border-bottom:1px dashed rgba(255,255,255,0.05);color:var(--off)}
+.wt td:first-child{color:var(--white)}
+.wt tr:last-child td{border-bottom:none}
+
+/* ARMOUR TABLE */
+.at{width:100%;border-collapse:collapse;font-size:11px;margin-top:3px}
+.at th{color:var(--yellow);text-align:left;padding:2px 4px;border-bottom:1px solid var(--border-s);font-family:'Oswald',sans-serif;font-size:10px;font-weight:700}
+.at td{padding:2px 4px;border-bottom:1px dashed rgba(255,255,255,0.05);color:var(--off)}
+.at td:first-child{color:var(--white)}
+.at tr:last-child td{border-bottom:none}
+
+.div{border:none;border-top:1px dashed rgba(255,255,255,0.07);margin:4px 0}
+.sp{height:3px}
+.note{font-size:11px;color:var(--muted);font-style:italic;margin-top:3px;line-height:1.35}
+.skull{color:var(--red);opacity:.6;font-size:11px}
+
+/* OMEN BOX */
+.omen{background:rgba(245,230,66,.05);border:1px solid var(--border-s);padding:5px 7px;font-size:11px;color:#cccc80;line-height:1.5;margin-top:4px}
+.omen strong{color:var(--yellow)}
+
+/* RESPONSIVE */
+@media(max-width:900px){.g3,.g4{grid-template-columns:1fr 1fr}.beast-g{grid-template-columns:1fr 1fr}.class-g{grid-template-columns:1fr 1fr}.loc-g{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.g2,.g3,.g4{grid-template-columns:1fr}.beast-g,.class-g,.loc-g,.cal-g,.ab-g{grid-template-columns:1fr}}
+</style>
+
+<div class="hdr">
+  <h1>Mörk Borg</h1>
+  <div class="hdr-sub">GM Reference &bull; A Dying World &bull; Pelle Nilsson &amp; Johan Nohr &bull; Free League / Stockholm Kartell</div>
+  <div class="hdr-tags">
+    <span class="tag ty">Pitch-Black Apocalypse</span>
+    <span class="tag tr">All Dice In Player Hands</span>
+    <span class="tag ty">d20 ± Ability vs DR</span>
+    <span class="tag tr">The World Will End</span>
+    <span class="tag tw">Compatible With Punk is Dead</span>
+  </div>
+</div>
+
+<div class="tabs" id="tabs"></div>
+<div id="panels"></div>
+
+<script>
+const data = {
+
+core:`<div class="g g3">
+<div class="c c-yellow">
+  <div class="ch">Core Resolution</div>
+  <div class="info"><strong>d20 ± ABILITY MODIFIER vs DR</strong><br>Roll equal or above the DR to succeed. Only players roll. Creatures never roll — they simply hit unless you defend.</div>
+  <div class="sp"></div>
+  <div class="dr">
+    <span class="drn">6</span><span class="drt">Routine — almost certain</span>
+    <span class="drn">8</span><span class="drt">Simple</span>
+    <span class="drn">10</span><span class="drt">Pretty simple</span>
+    <span class="drn">12</span><span class="drt">Normal (default DR)</span>
+    <span class="drn">14</span><span class="drt">Difficult</span>
+    <span class="drn">16</span><span class="drt">Really hard</span>
+    <span class="drn">18</span><span class="drt">Should not be possible</span>
+  </div>
+  <div class="div"></div>
+  <div class="ch w">Ability Scores</div>
+  <div class="ab-g">
+    <div class="ab"><span class="abn">STRENGTH</span><span class="abd">Melee attacks. Carrying capacity. Physical force.</span></div>
+    <div class="ab"><span class="abn">AGILITY</span><span class="abd">Defence. Ranged attacks. Speed & finesse.</span></div>
+    <div class="ab"><span class="abn">PRESENCE</span><span class="abd">Powers/scrolls. Morale. Social force.</span></div>
+    <div class="ab"><span class="abn">TOUGHNESS</span><span class="abd">HP contribution. Endurance. Pain tolerance.</span></div>
+  </div>
+  <div class="div"></div>
+  <div class="ch w">Modifier Table (3d6)</div>
+  <div class="score-tbl">
+    <span class="sc-roll">1–4</span><span class="sc-mod">-3</span><span class="sc-label">Wretched</span>
+    <span class="sc-roll">5–6</span><span class="sc-mod">-2</span><span class="sc-label">Poor</span>
+    <span class="sc-roll">7–8</span><span class="sc-mod">-1</span><span class="sc-label">Weak</span>
+    <span class="sc-roll">9–12</span><span class="sc-mod">0</span><span class="sc-label">Average</span>
+    <span class="sc-roll">13–14</span><span class="sc-mod">+1</span><span class="sc-label">Capable</span>
+    <span class="sc-roll">15–16</span><span class="sc-mod">+2</span><span class="sc-label">Strong</span>
+    <span class="sc-roll">17–20</span><span class="sc-mod">+3</span><span class="sc-label">Formidable</span>
+  </div>
+  <p class="note">Classes: roll 4d6 drop lowest for two favoured abilities, 3d6 for the others. Classless: 4d6 drop lowest for all four.</p>
+</div>
+
+<div class="c c-red">
+  <div class="ch r">Violence</div>
+  <div class="rw"><span class="rl">INITIATIVE</span><span class="rv">d6: 1–3 enemies first / 4–6 PCs first</span></div>
+  <div class="rw"><span class="rl">INDIVIDUAL INIT.</span><span class="rv">Agility + d6 for specific order</span></div>
+  <div class="rw"><span class="rl">MELEE ATTACK</span><span class="rv">d20 + Strength vs DR12</span></div>
+  <div class="rw"><span class="rl">RANGED ATTACK</span><span class="rv">d20 + Agility vs DR12</span></div>
+  <div class="rw"><span class="rl">DEFEND</span><span class="rv">d20 + Agility vs DR12. Fail = take full damage.</span></div>
+  <div class="rw"><span class="rl">CRIT (nat 20 attack)</span><span class="rv">Double damage + reduce enemy armour tier by 1</span></div>
+  <div class="rw"><span class="rl">CRIT (nat 20 defend)</span><span class="rv">Free counterattack</span></div>
+  <div class="rw"><span class="rl">FUMBLE (nat 1 attack)</span><span class="rv">You fall or drop weapon — GM decides</span></div>
+  <div class="rw"><span class="rl">FUMBLE (nat 1 defend)</span><span class="rv">Double damage + your armour loses a tier</span></div>
+  <div class="div"></div>
+  <div class="ch r">At 0 HP — Broken <span class="skull">☠</span></div>
+  <p class="note" style="margin-bottom:3px">Roll d4:</p>
+  <div class="broken-g">
+    <span class="bn">1</span><span class="bt">Unconscious d4 rounds — awaken with 1 HP</span>
+    <span class="bn">2</span><span class="bt">Lost a limb or eye — roll d6: 1–2 arm · 3 leg · 4 eye · 5–6 ear. Out of action d4 rounds, 1 HP.</span>
+    <span class="bn">3</span><span class="bt">Haemorrhage. Die in d4 hours without aid. All tests DR16.</span>
+    <span class="bn">4</span><span class="bt">DEAD. No save. No mercy. Start a new character.</span>
+  </div>
+  <div class="warn" style="margin-top:4px"><strong>NEGATIVE HP = DEAD IMMEDIATELY.</strong> No roll. No bargaining.</div>
+  <div class="div"></div>
+  <div class="ch r">Morale</div>
+  <div class="rw"><span class="rl">CHECK WHEN</span><span class="rv">Leader dies / half group down / ⅓ HP left</span></div>
+  <div class="rw"><span class="rl">ROLL</span><span class="rv">2d6 vs their Morale rating</span></div>
+  <div class="rw"><span class="rl">BEAT MORALE</span><span class="rv">d6: 1–3 flees · 4–6 surrenders</span></div>
+  <div class="rw"><span class="rl">NO MORALE LISTED</span><span class="rv">Fights to the death</span></div>
+</div>
+
+<div class="c">
+  <div class="ch">Armour &amp; Weapons</div>
+  <table class="at">
+    <tr><th>Armour</th><th>Damage Reduction</th><th>AGL Penalty</th></tr>
+    <tr><td>No armour / rags</td><td>— (0)</td><td>—</td></tr>
+    <tr><td>Light armour</td><td>-d2</td><td>—</td></tr>
+    <tr><td>Medium armour</td><td>-d4</td><td>DR+2 AGL tests</td></tr>
+    <tr><td>Heavy armour</td><td>-d6</td><td>DR+4 AGL tests · DR+2 defend</td></tr>
+    <tr><td>Shield</td><td>-1 damage</td><td>OR: absorb one attack (shield breaks)</td></tr>
+  </table>
+  <div class="div"></div>
+  <table class="wt">
+    <tr><th>Weapon Type</th><th>Damage</th><th>Notes</th></tr>
+    <tr><td>Improvised / fists</td><td>d2</td><td>—</td></tr>
+    <tr><td>Small (knife, hatchet)</td><td>d4</td><td>—</td></tr>
+    <tr><td>Medium (sword, club)</td><td>d6</td><td>Most common</td></tr>
+    <tr><td>Large (two-handed)</td><td>d8</td><td>Both hands required</td></tr>
+    <tr><td>Huge (greataxe)</td><td>d10</td><td>Slow, heavy</td></tr>
+    <tr><td>Exceptional / cursed</td><td>d12+</td><td>Rare. Found, not bought.</td></tr>
+  </table>
+  <div class="div"></div>
+  <div class="ch w">Rest &amp; Recovery</div>
+  <div class="rw"><span class="rl">SHORT REST</span><span class="rv">Roll HP die — if higher than current HP, restore to that value</span></div>
+  <div class="rw"><span class="rl">FULL NIGHT REST</span><span class="rv">Restore all HP. Recover powers.</span></div>
+  <div class="rw"><span class="rl">CARRY LIMIT</span><span class="rv">Strength modifier + 8 normal-sized items</span></div>
+  <div class="rw"><span class="rl">OMENS</span><span class="rv">d2 per day (varies by class). Spend to: max damage / reroll any die / lower damage against you / negate a crit or fumble / lower DR on a test.</span></div>
+</div>
+</div>`,
+
+powers:`<div class="g g3">
+<div class="c c-yellow">
+  <div class="ch">Powers (Scrolls)</div>
+  <p class="note" style="margin-bottom:4px">At dawn, roll d4 + Presence modifier. That's how many powers you can use today. Choose which scrolls from your available list before play begins.</p>
+  <div class="rw"><span class="rl">USE A POWER</span><span class="rv">d20 + Presence vs DR12</span></div>
+  <div class="rw"><span class="rl">FAIL</span><span class="rv">Dizzy — lose d2 HP. All further powers fail this day.</span></div>
+  <div class="rw"><span class="rl">CRITICAL FAIL (1)</span><span class="rv">Roll on Arcane Catastrophes table immediately.</span></div>
+  <div class="warn" style="margin-top:4px"><strong>ONCE POWERS FAIL, THEY FAIL FOR THE DAY.</strong> A single misfire locks out all remaining power uses.</div>
+  <div class="div"></div>
+  <div class="ch w">Unclean Scrolls (select)</div>
+  <div class="pow-g">
+    <span class="pn">Foul Orb</span><span class="pt">d6 damage ranged. On crit: target is blinded until healed.</span>
+    <span class="pn">Leech</span><span class="pt">Drain d4 HP from target. You heal that amount.</span>
+    <span class="pn">Unholy Ground</span><span class="pt">Area becomes supernaturally hostile. d4 damage per round to enemies who stay.</span>
+    <span class="pn">Wither</span><span class="pt">Target loses d2 from an ability score until next rest.</span>
+    <span class="pn">Summon Familiar</span><span class="pt">A strange creature appears. d6 HP, d4 damage, does your bidding for one day.</span>
+    <span class="pn">Soul Drinker</span><span class="pt">On killing a creature, restore d6 HP.</span>
+  </div>
+  <div class="div"></div>
+  <div class="ch w">Sacred Scrolls (select)</div>
+  <div class="pow-g">
+    <span class="pn">Grace for a Sinner</span><span class="pt">Heal d6 HP on touch. Cannot target self.</span>
+    <span class="pn">Shield of Faith</span><span class="pt">Target gains -d4 armour for one combat.</span>
+    <span class="pn">Banish</span><span class="pt">Undead or demon must flee. DR14 Presence to resist.</span>
+    <span class="pn">Righteous Strike</span><span class="pt">Next attack this day: double damage die.</span>
+    <span class="pn">Light of Salvation</span><span class="pt">Blinding light — all enemies DR14 AGL or blinded one round.</span>
+    <span class="pn">Lay on Hands</span><span class="pt">Cure one infection, poison, or broken limb with touch.</span>
+  </div>
+</div>
+
+<div class="c c-red">
+  <div class="ch r">Arcane Catastrophes (nat 1 on powers)</div>
+  <p class="note" style="margin-bottom:4px">Roll d12:</p>
+  <div class="pow-g" style="gap:3px 8px">
+    <span class="pn">1</span><span class="pt">d6 damage to self. Smoke pours from every orifice.</span>
+    <span class="pn">2</span><span class="pt">Random ally takes d6 damage. You smell of burning hair.</span>
+    <span class="pn">3</span><span class="pt">Blind for d4 hours.</span>
+    <span class="pn">4</span><span class="pt">Mute for d6 hours. No scrolls possible.</span>
+    <span class="pn">5</span><span class="pt">Lose all Omens for today. They burn away visibly.</span>
+    <span class="pn">6</span><span class="pt">A random body part shrinks to half size (d6: 1 hand · 2 foot · 3 ear · 4 nose · 5 eye · 6 tongue). Permanent unless cured.</span>
+    <span class="pn">7</span><span class="pt">Attract the nearest hostile creature immediately.</span>
+    <span class="pn">8</span><span class="pt">Presence drops by d4 until next dawn.</span>
+    <span class="pn">9</span><span class="pt">Power works but affects the wrong target — GM chooses who.</span>
+    <span class="pn">10</span><span class="pt">You age d10 years in a moment. Visibly.</span>
+    <span class="pn">11</span><span class="pt">d10 damage to self. Power does not activate.</span>
+    <span class="pn">12</span><span class="bt" style="color:#ff6060;font-weight:700">DEAD. The power tears you apart from the inside.</span>
+  </div>
+  <div class="div"></div>
+  <div class="ch r">The Basilisks Demand</div>
+  <p class="note" style="margin-bottom:3px">Roll d20 for what the basilisk demands of a PC (adventure hook):</p>
+  <div class="rw"><span class="rl">1–3</span><span class="rv">The skull of a priest of the opposite faith</span></div>
+  <div class="rw"><span class="rl">4–6</span><span class="rv">A fresh heart still warm from the chest</span></div>
+  <div class="rw"><span class="rl">7–9</span><span class="rv">The last page of a forbidden scripture</span></div>
+  <div class="rw"><span class="rl">10–12</span><span class="rv">Three days of silence and self-mortification</span></div>
+  <div class="rw"><span class="rl">13–15</span><span class="rv">One who betrayed you — alive and delivered</span></div>
+  <div class="rw"><span class="rl">16–18</span><span class="rv">The tears of an innocent wept at your feet</span></div>
+  <div class="rw"><span class="rl">19–20</span><span class="rv">Your most prized possession, burned to ash</span></div>
+</div>
+
+<div class="c">
+  <div class="ch">Getting Better (or Worse)</div>
+  <p class="note" style="margin-bottom:4px">GM decides when characters advance. After a session of notable achievement:</p>
+  <div class="rw"><span class="rl">HP INCREASE</span><span class="rv">Roll your HP die. If higher than current max, that becomes your max.</span></div>
+  <div class="rw"><span class="rl">ABILITY CHANGES</span><span class="rv">Roll d6 for each ability. Equal or above current score: +1 (max +3). Below score: -1 (min -3).</span></div>
+  <div class="rw"><span class="rl">SILVER</span><span class="rv">Currency. Loot corpses. Sell found relics. Spend at market.</span></div>
+  <div class="div"></div>
+  <div class="ch w">Terrible Traits (d20, optional)</div>
+  <div class="pow-g" style="gap:2px 8px;font-size:10.5px">
+    <span class="pn">1–2</span><span class="pt">Constantly bleeding from somewhere. Lose 1 HP per day unless bandaged.</span>
+    <span class="pn">3–4</span><span class="pt">Cannot read. Scrolls take twice as long to decipher.</span>
+    <span class="pn">5–6</span><span class="pt">Smell of death. Animals flee or attack on sight.</span>
+    <span class="pn">7–8</span><span class="pt">Sleep terrors. After rest, DR12 Presence or start the day with -1 to all tests.</span>
+    <span class="pn">9–10</span><span class="pt">Compulsive liar. GM may occasionally override your stated actions.</span>
+    <span class="pn">11–12</span><span class="pt">Left hand moves independently. Sometimes helpful, often dangerous.</span>
+    <span class="pn">13–14</span><span class="pt">Eyes glow faintly in the dark. No sneaking at night.</span>
+    <span class="pn">15–16</span><span class="pt">Light itself despises you. Torches go out within 10 feet.</span>
+    <span class="pn">17–18</span><span class="bt">A mouth has opened on your neck. It spits your secrets. Silenced only with blood.</span>
+    <span class="pn">19–20</span><span class="pt">Roll twice. Both apply.</span>
+  </div>
+  <div class="div"></div>
+  <div class="ch w">Corpse Plundering (d6)</div>
+  <div class="pow-g" style="gap:2px 8px;font-size:10.5px">
+    <span class="pn">1</span><span class="pt">d20 silver</span>
+    <span class="pn">2</span><span class="pt">Useable weapon</span>
+    <span class="pn">3</span><span class="pt">Scroll (roll sacred or unclean, d2)</span>
+    <span class="pn">4</span><span class="pt">Piece of armour (1d3: 1 light · 2 medium · 3 heavy)</span>
+    <span class="pn">5</span><span class="pt">d6 rations / water</span>
+    <span class="pn">6</span><span class="bt">Occult treasure (d10×10 silver value — or a curse)</span>
+  </div>
+</div>
+</div>`,
+
+classes:`<div class="g g2">
+<div class="c">
+  <div class="ch">The Six Optional Classes</div>
+  <div class="class-g">
+    <div class="cc">
+      <span class="ccn">Fanged Deserter</span>
+      <span class="cca">STR favoured. HP: Toughness+d10. Starts 2d6×10s + d2 Omens.</span>
+      <span class="ccd">Your teeth — enormous, thick, sharp — have never let you down. Bite attack: DR10, d6 damage, must be close. 1–2 on d6: enemy gets a free attack.<br>
+      Roll d6 for earliest memory: 1 burnt building in Sarkash · 2 a wolf's belly · 3 blood on snow · 4 the inside of a dungeon · 5 a hanging · 6 nothing at all.</span>
+    </div>
+    <div class="cc">
+      <span class="ccn">Gutterborn Scum</span>
+      <span class="cca">AGL favoured. HP: Toughness+d8. Starts d6×10s + d2 Omens.</span>
+      <span class="ccd">Roll d6 for your specialty: 1 Hide in muck/debris (DR8 to hide) · 2 Pick locks (DR8) · 3 Identify poison by taste (usually) · 4 Climb anything · 5 Lie convincingly · 6 Run fast (always first in initiative).</span>
+    </div>
+    <div class="cc">
+      <span class="ccn">Esoteric Hermit</span>
+      <span class="cca">PRES favoured. HP: Toughness+d6. Starts d4×10s + d4 Omens.</span>
+      <span class="ccd">Start with d4+2 powers. Use all scrolls — sacred and unclean alike. Roll d4 for your dark secret: 1 not entirely human · 2 made a pact you regret · 3 you've already died once · 4 something is inside you.</span>
+    </div>
+    <div class="cc">
+      <span class="ccn">Wretched Royalty</span>
+      <span class="cca">PRES favoured. HP: Toughness+d8. Starts d6×10×10s + d2 Omens.</span>
+      <span class="ccd">Wealthy start. A servant (2 HP, d4 damage) who follows you. The servant will die. They always do. Roll d6 for your disgrace: 1 exile · 2 debts · 3 a terrible secret · 4 madness in the bloodline · 5 your own crimes · 6 prophecy.</span>
+    </div>
+    <div class="cc">
+      <span class="ccn">Heretical Priest</span>
+      <span class="cca">PRES favoured. HP: Toughness+d6. Starts d4×10s + d4 Omens.</span>
+      <span class="ccd">Sacred scrolls cost one less Presence use. Roll d6 for your heresy: 1 deny the basilisks · 2 worship forbidden god · 3 sell indulgences · 4 perform banned rites · 5 consorting with the undead · 6 you ate someone holy.</span>
+    </div>
+    <div class="cc">
+      <span class="ccn">Occult Herbmaster</span>
+      <span class="cca">TOUGH favoured. HP: Toughness+d6. Starts d4×10s + d2 Omens.</span>
+      <span class="ccd">Begin with d4+1 concoctions. Roll d8 per concoction: 1 Ezumiel's Vapor (DR14 or hallucinations d4h) · 2 Frog Stew (vomit d4h, DR14 or useless) · 3 Spider-Owl Soup (darkvision + climb 30min) · 4 Elixir Vitalis (heals d6 HP) · 5 Fernor's Philtre (heal infection, +2 Presence d4h) · 6 Snuff Berserk (2 attacks, defend DR14, one fight) · 7 Black Poison (d6 HP loss + blind 1h) · 8 Roll twice.</span>
+    </div>
+  </div>
+</div>
+<div class="c">
+  <div class="ch">Classless Character Creation</div>
+  <ul class="sl" style="list-style:none">
+    <li style="display:flex;gap:7px;padding:2px 0;border-bottom:1px dashed rgba(255,255,255,0.05);font-size:11.5px;line-height:1.4"><span style="color:var(--yellow);flex-shrink:0;font-family:Oswald,sans-serif;font-weight:700;min-width:20px">1</span><span style="color:var(--off)">Roll 4d6 drop lowest for all four abilities. Convert to modifier.</span></li>
+    <li style="display:flex;gap:7px;padding:2px 0;border-bottom:1px dashed rgba(255,255,255,0.05);font-size:11.5px;line-height:1.4"><span style="color:var(--yellow);flex-shrink:0;font-family:Oswald,sans-serif;font-weight:700;min-width:20px">2</span><span style="color:var(--off)">Roll HP: d8 + Toughness modifier (minimum 1).</span></li>
+    <li style="display:flex;gap:7px;padding:2px 0;border-bottom:1px dashed rgba(255,255,255,0.05);font-size:11.5px;line-height:1.4"><span style="color:var(--yellow);flex-shrink:0;font-family:Oswald,sans-serif;font-weight:700;min-width:20px">3</span><span style="color:var(--off)">Roll starting silver: d6×10 silver.</span></li>
+    <li style="display:flex;gap:7px;padding:2px 0;border-bottom:1px dashed rgba(255,255,255,0.05);font-size:11.5px;line-height:1.4"><span style="color:var(--yellow);flex-shrink:0;font-family:Oswald,sans-serif;font-weight:700;min-width:20px">4</span><span style="color:var(--off)">Roll starting weapon on weapon table (d6). Roll armour (d4: 1–2 no armour · 3 light · 4 medium).</span></li>
+    <li style="display:flex;gap:7px;padding:2px 0;border-bottom:1px dashed rgba(255,255,255,0.05);font-size:11.5px;line-height:1.4"><span style="color:var(--yellow);flex-shrink:0;font-family:Oswald,sans-serif;font-weight:700;min-width:20px">5</span><span style="color:var(--off)">Roll d3 Omens.</span></li>
+    <li style="display:flex;gap:7px;padding:2px 0;border-bottom:1px dashed rgba(255,255,255,0.05);font-size:11.5px;line-height:1.4"><span style="color:var(--yellow);flex-shrink:0;font-family:Oswald,sans-serif;font-weight:700;min-width:20px">6</span><span style="color:var(--off)">Optional: roll on Terrible Traits, Troubling Tales, and Bad Habits tables for flavour.</span></li>
+    <li style="display:flex;gap:7px;padding:2px 0;font-size:11.5px;line-height:1.4"><span style="color:var(--yellow);flex-shrink:0;font-family:Oswald,sans-serif;font-weight:700;min-width:20px">7</span><span style="color:var(--off)">Pick a name. Try not to get attached to it.</span></li>
+  </ul>
+  <div class="div"></div>
+  <div class="ch w">Bad Weather (d8, roll each day)</div>
+  <div class="rw"><span class="rl">1</span><span class="rv">Acid rain. d2 damage per hour unprotected.</span></div>
+  <div class="rw"><span class="rl">2</span><span class="rv">Blinding fog. Ranged attacks impossible. DR+2 all navigation.</span></div>
+  <div class="rw"><span class="rl">3</span><span class="rv">Howling gale. DR+2 movement and ranged. Fires extinguished.</span></div>
+  <div class="rw"><span class="rl">4</span><span class="rv">Blood-warm rain. Nothing unusual — just ominous.</span></div>
+  <div class="rw"><span class="rl">5</span><span class="rv">Ash fall from somewhere distant. Lungs burn. DR+1 all tests.</span></div>
+  <div class="rw"><span class="rl">6</span><span class="rv">Freezing cold. d2 damage per hour without shelter or heavy cloak.</span></div>
+  <div class="rw"><span class="rl">7</span><span class="rv">Lightning. Any metal-armoured character: DR14 AGL or struck d8.</span></div>
+  <div class="rw"><span class="rl">8</span><span class="rv">Unnervingly clement. The world is holding its breath.</span></div>
+  <div class="div"></div>
+  <div class="ch w">Reaction (d6, for unknown NPCs)</div>
+  <div class="rw"><span class="rl">1</span><span class="rv">Violent hostility. Attacks immediately.</span></div>
+  <div class="rw"><span class="rl">2–3</span><span class="rv">Suspicious. Will not help. May warn others.</span></div>
+  <div class="rw"><span class="rl">4–5</span><span class="rv">Cautious. Parley possible.</span></div>
+  <div class="rw"><span class="rl">6</span><span class="rv">Friendly. Almost certainly going to die helping you.</span></div>
+</div>
+</div>`,
+
+calendar:`<div class="g g3">
+<div class="c c-red">
+  <div class="ch r">The Calendar of Nechrubel</div>
+  <p class="note" style="margin-bottom:4px">At each new dawn the GM rolls the chosen apocalypse die. On a 1: a Misery occurs. Roll d66 (two d6, tens and units) and consult the Nameless Scriptures. After SIX miseries, the seventh roll of 1 triggers 7:7 — THE LAST. The game ends. Burn the book.</p>
+  <div class="rw"><span class="rl">d2</span><span class="rv">One-night campaign (fastest apocalypse)</span></div>
+  <div class="rw"><span class="rl">d4</span><span class="rv">A night or two</span></div>
+  <div class="rw"><span class="rl">d6</span><span class="rv">A handful of sessions</span></div>
+  <div class="rw"><span class="rl">d10</span><span class="rv">Weeks of play</span></div>
+  <div class="rw"><span class="rl">d20</span><span class="rv">Months of campaign</span></div>
+  <div class="rw"><span class="rl">d100</span><span class="rv">A bleak half-year or more</span></div>
+  <div class="div"></div>
+  <div class="ch r">The Nameless Scriptures — Selected Miseries</div>
+  <div class="cal-g">
+    <div class="cal"><span class="cal-ref">1:1</span><span class="cal-txt">The City shall be made hollow. Those within it shall not be seen — they vanish without trace.</span></div>
+    <div class="cal"><span class="cal-ref">1:2</span><span class="cal-txt">The earth shakes. From the cracks rises a poisonous mist. In ten days it will shroud all.</span></div>
+    <div class="cal"><span class="cal-ref">1:4</span><span class="cal-txt">Flying spectres and crawling beasts pour from the underworld. The worm grows fat, the vulture weary.</span></div>
+    <div class="cal"><span class="cal-ref">1:5</span><span class="cal-txt">Doubt is crowned. The loyal shall turn their blades on those who silver gave.</span></div>
+    <div class="cal"><span class="cal-ref">1:6</span><span class="cal-txt">Blood-cough spreads like fire across the drought-lands.</span></div>
+    <div class="cal"><span class="cal-ref">2:1</span><span class="cal-txt">All manner of fly and wasp shall fill the air. As at the beginning, so at the end.</span></div>
+    <div class="cal"><span class="cal-ref">3:1</span><span class="cal-txt">At Graven-Tosk the soil grows warm. Those who rest are made to walk.</span></div>
+    <div class="cal"><span class="cal-ref">3:3</span><span class="cal-txt">Hunger comes. The gaunt prey upon the gaunt. Children torn from the breast.</span></div>
+    <div class="cal"><span class="cal-ref">3:6</span><span class="cal-txt">Brother slays Brother. Sister poisons Sister. All bonds dissolve.</span></div>
+    <div class="cal"><span class="cal-ref">4:3</span><span class="cal-txt">From the West comes fire and a horde. The Kingdoms burn.</span></div>
+    <div class="cal"><span class="cal-ref">4:4</span><span class="cal-txt">The liar Arkh makes knots of men's hearts, sundering all bonds of loyalty.</span></div>
+    <div class="cal"><span class="cal-ref">6:1</span><span class="cal-txt">The sun sets and shall never rise again. Day is made perpetual night.</span></div>
+    <div class="cal"><span class="cal-ref">6:3</span><span class="cal-txt">Anthelia shall have her will and drink all colour from the world.</span></div>
+    <div class="cal cal-final"><span class="cal-ref">7:7 — THE LAST</span><span class="cal-txt">"All praise Yetsabu-Nech, the underworld's nightmare, the black disk which stands before the sun! All praise Verhu, beaming with delight! All praise the fire which burns all! And the darkness shall swallow the darkness." THE GAME AND YOUR LIVES END HERE. BURN THE BOOK.</span></div>
+  </div>
+</div>
+
+<div class="c">
+  <div class="ch">The Two-Headed Basilisks</div>
+  <div class="rw"><span class="rl">VERHU</span><span class="rv">Embodies the Damned Truth. His word always comes to pass. Only speaks in truths. The prophesying head — it was HE who whispered doom into the world.</span></div>
+  <div class="rw"><span class="rl">GORGH</span><span class="rv">Embodies Bitterness. Envious of Verhu's worship. Resentful, spiteful, petty. Will grant dark boons but demands degrading payment.</span></div>
+  <div class="rw"><span class="rl">NECHRUBEL</span><span class="rv">The Shadow that covers all. Melancholy, crop failure, war. Whispered the apocalyptic prophecies in Verhu's ear. Arch-priestess Josilfa may have made a deal with it for eternal life.</span></div>
+  <div class="rw"><span class="rl">YETSABU-NECH</span><span class="rv">The underworld's nightmare. The black disk that stands before the sun. Final entity named in the last psalm.</span></div>
+  <div class="rw"><span class="rl">ARKH</span><span class="rv">The Liar. Makes knots of men's hearts and sunders all bonds. Named in psalm 4:4.</span></div>
+  <div class="div"></div>
+  <div class="ch w">Calendar of Nechrubel — Die Options</div>
+  <div class="omen"><strong>The basilisks kill outright only as a last resort.</strong> They prefer to corrupt, to set hopeless quests, to watch suffering. Use their demands as adventure hooks. They are petty gods who enjoy the squirming.<br><br>
+  <strong>VERHU &amp; GORGH LUST FOR:</strong> The skull of a rival priest · A fresh still-warm heart · The last page of a forbidden book · An innocents' tears · Your most treasured possession reduced to ash · Three days of self-mortification · A traitor delivered alive · A massacre witnessed without flinching.</div>
+</div>
+
+<div class="c c-yellow">
+  <div class="ch">Occult Treasures (d10)</div>
+  <div class="pow-g" style="gap:2px 8px;font-size:10.5px">
+    <span class="pn">1</span><span class="pt">A finger bone that points north — even underground, even when it shouldn't.</span>
+    <span class="pn">2</span><span class="pt">A lantern that burns black, illuminating only things not meant to be seen.</span>
+    <span class="pn">3</span><span class="pt">A mask of dried skin. The wearer takes on the last memories of its original owner.</span>
+    <span class="pn">4</span><span class="pt">Seven silver coins — each with a different dead king's face. None are from this realm.</span>
+    <span class="pn">5</span><span class="pt">A small cage containing something that screams but cannot be seen.</span>
+    <span class="pn">6</span><span class="pt">A letter written in blood, addressed to you personally, dated 40 years from now.</span>
+    <span class="pn">7</span><span class="pt">A mirror that shows the room as it was 100 years ago. Or what it will become.</span>
+    <span class="pn">8</span><span class="pt">A tooth that grows back if pulled. From a god's mouth, you were told. Don't ask which god.</span>
+    <span class="pn">9</span><span class="pt">A vial of absolute darkness — physical, cold, and hungry.</span>
+    <span class="pn">10</span><span class="pt">An unclean scroll of unknown power. Roll for it. Pray for the result.</span>
+  </div>
+  <div class="div"></div>
+  <div class="ch w">Traps &amp; Devilry (d6)</div>
+  <div class="pow-g" style="gap:2px 8px;font-size:10.5px">
+    <span class="pn">1</span><span class="pt">Pressure plate. Spikes: d6. DR12 AGL to spot.</span>
+    <span class="pn">2</span><span class="pt">Tripwire + dropping ceiling section: d8. DR10 AGL to spot.</span>
+    <span class="pn">3</span><span class="pt">Poison needle in a lock. TOUGH DR14 or d6 damage per hour for 6h.</span>
+    <span class="pn">4</span><span class="pt">False floor over a 20-foot pit. 2d6 damage. DR14 AGL to spot.</span>
+    <span class="pn">5</span><span class="pt">Scything blade in a corridor. d10. Triggered by shadow, not weight.</span>
+    <span class="pn">6</span><span class="bt">A door that is also a mouth. DR12 STR or you're swallowed. The door has d8 HP.</span>
+  </div>
+</div>
+</div>`,
+
+bestiary:`<div class="c">
+  <div class="ch">Creatures of the Dying World</div>
+  <div class="beast-g">
+    <div class="beast">
+      <span class="bname">Goblin Scum</span>
+      <div class="bstats"><span class="bs">HP d6</span><span class="bs">Morale 5</span><span class="bs r">Claw/Bite d4</span></div>
+      <span class="bsp">Hideously gaunt midget-zombies even when alive. Attack in packs. MARK: if they bite you without you killing them first, roll d6 after d6 days — on 1 you become a goblin. They cannot be reasoned with. Their numbers swell endlessly.</span>
+    </div>
+    <div class="beast">
+      <span class="bname">Berserker</span>
+      <div class="bstats"><span class="bs">HP 2d8</span><span class="bs">Morale 9</span><span class="bs r">Axe d8</span></div>
+      <span class="bsp">Blood-maddened warrior. Does not feel pain. Attacks twice per round when below half HP. Will not flee. Cannot be reasoned with while in battle rage. Worth 50 silver if captured and sold to fighting pits.</span>
+    </div>
+    <div class="beast">
+      <span class="bname">Wraith</span>
+      <div class="bstats"><span class="bs">HP d6+2</span><span class="bs r">Touch d4+drain</span></div>
+      <span class="bsp">Immune to non-magical weapons. On hit: target loses d2 from a random ability until dawn. Abilities drained to -3 = you become a wraith. Only silver or sacred weapons harm them. Light slows them (cannot move in torchlight).</span>
+    </div>
+    <div class="beast">
+      <span class="bname">Blood-Drenched Skeleton</span>
+      <div class="bstats"><span class="bs">HP d6+2</span><span class="bs">Morale —</span><span class="bs r">Weapon d6</span><span class="bs">Armour -d2</span></div>
+      <span class="bsp">Ancient warrior, dripping with fresh blood despite having no flesh. Fights to the death (no morale). Bludgeoning weapons deal +d4 damage. Blades do half. Reassembles after 1 round unless bones are scattered — must spend an action to scatter them.</span>
+    </div>
+    <div class="beast">
+      <span class="bname">Undead Necromancer (Weak)</span>
+      <div class="bstats"><span class="bs">HP d8</span><span class="bs">Morale 7</span><span class="bs r">Staff d4</span><span class="bs r">Drain d4</span></div>
+      <span class="bsp">Power Drain: on hit with Drain, target loses 1 use of a scroll or power permanently. Can raise d4 skeletons from nearby corpses (1 action). Will flee when below half HP to raise more reinforcements. 100 silver value if captured alive.</span>
+    </div>
+    <div class="beast">
+      <span class="bname">Troll</span>
+      <div class="bstats"><span class="bs">HP 3d8</span><span class="bs">Morale 8</span><span class="bs r">Claw d8</span><span class="bs r">Bite d10</span></div>
+      <span class="bsp">Regenerates d4 HP per round unless fire or acid was used last round. Two attacks per turn. If killed without fire/acid: rises with d8 HP after 3 rounds. Must be burned to stay dead. Slow to act on first round of combat — can be fled if you're fast.</span>
+    </div>
+    <div class="beast">
+      <span class="bname">Zombie</span>
+      <div class="bstats"><span class="bs">HP d8+2</span><span class="bs">Morale —</span><span class="bs r">Grasp d4</span></div>
+      <span class="bsp">Slow — cannot run. If grasped: DR12 STR each round to break free. Grasped creatures can't attack. On death: rises with 1 HP after d4 rounds UNLESS head is destroyed. No morale. No mercy. Fire ends them permanently.</span>
+    </div>
+    <div class="beast">
+      <span class="bname">Undead Doll</span>
+      <div class="bstats"><span class="bs">HP d4</span><span class="bs">Morale —</span><span class="bs r">Bite d2+curse</span></div>
+      <span class="bsp">A child's toy. Something is inside it now. CURSE: victim of a bite must pass DR14 Presence or hear whispering for d6 days (-1 to all Presence tests while cursed). Hard to destroy — regenerates unless burned. Seeks out its original owner.</span>
+    </div>
+    <div class="beast">
+      <span class="bname">Grotesque</span>
+      <div class="bstats"><span class="bs">HP 2d6</span><span class="bs">Morale 6</span><span class="bs r">Limb d6</span><span class="bs">Armour -d2</span></div>
+      <span class="bsp">A mass of wrongly-assembled limbs and faces. Faces on the body scream constantly — DR10 Presence or distracted (-1 to attack). Limbs may grab — DR10 STR to break free. Several of the faces are still alive. They know things.</span>
+    </div>
+    <div class="beast">
+      <span class="bname">Wickhead Knave</span>
+      <div class="bstats"><span class="bs">HP d8</span><span class="bs">Morale 7</span><span class="bs r">Dagger d4</span><span class="bs r">Crossbow d6</span></div>
+      <span class="bsp">Cunning cult thug with a lit candle embedded in their skull (they don't seem to notice). Fights dirty — if outnumbered, will flee through previously scouted escape routes. Travels in groups of d4. Loyal to the Inquisition. Loves to backstab (undetected: +d4 damage).</span>
+    </div>
+    <div class="beast">
+      <span class="bname">Shadow King's Servant</span>
+      <div class="bstats"><span class="bs">HP d8+4</span><span class="bs">Morale 9</span><span class="bs r">Rusted blade d8</span><span class="bs">Armour -d4</span></div>
+      <span class="bsp">Courtier of the Palace at Graven-Tosk. Dressed in rotting finery. Speaks in ancient dialect. Desires only to serve the Shadow King and bring more souls to the palace. Will not attack first if approached with courtesy — but remembers every slight.</span>
+    </div>
+    <div class="beast">
+      <span class="bname">Sarkash Creature</span>
+      <div class="bstats"><span class="bs">HP 2d6</span><span class="bs">Morale 7</span><span class="bs r">Claw d6</span><span class="bs r">Bite d8</span></div>
+      <span class="bsp">Born from the dark of Sarkash forest where growth has become murderous. Roll d4 for type: 1 a wolf with too many legs · 2 a bear whose face is gone · 3 a deer made entirely of briars · 4 something that used to be a shepherd. All are hungry. None can be tamed.</span>
+    </div>
+  </div>
+</div>`,
+
+world:`<div class="g g3">
+<div class="c">
+  <div class="ch">The Dying World</div>
+  <p class="note" style="margin-bottom:4px">"Distances shift. Paths between places warp. As if this pale, lightless world possessed a will and bitter life."</p>
+  <div class="loc-g">
+    <div class="loc">
+      <span class="locn">Galgenbeck</span>
+      <span class="loct">Greatest City. Cathedral of the Two-Headed Basilisks.</span>
+      <span class="locd">Ruled not by a king but by Arch-Priestess Josilfa Migol — old but appears young. Commoners whisper she deals with Nechrubel for eternal life. Heretics are hunted by the Inquisition and corrected publicly. The Cathedral looms over all, a gothic horror of faith and power.</span>
+    </div>
+    <div class="loc">
+      <span class="locn">Sarkash</span>
+      <span class="loct">The Cursed Forest. Dark trees. Deadly growth.</span>
+      <span class="locd">Grows far too quickly. Brimming with murderous wildlife forced outward by something warm and wrong at its heart — a heat born from the burgeoning apocalypse. The Palace of the Shadow King rises from within Sarkash's deepest reaches. Do not enter without fire and company.</span>
+    </div>
+    <div class="loc">
+      <span class="locn">Graven-Tosk</span>
+      <span class="loct">Fields of Death. The Valley of the Unfortunate Undead.</span>
+      <span class="locd">Soil grows warm at night. Those who died here rise and walk. The Shadow King's palace stands here — a gothic castle, mirror of the Cathedral, mostly in ruins. His courtiers still serve. His princes disguise themselves as ordinary men. The Valley is full of the dead who won't stay that way.</span>
+    </div>
+    <div class="loc">
+      <span class="locn">Kergüs</span>
+      <span class="loct">Barren Wasteland. White stone. Blood Countess Anthelia.</span>
+      <span class="locd">Cold, colourless. Blood Countess Anthelia rules from a limestone castle in Alliáns, Kergüs. Possibly a vampire — seeks colour and warmth. Promises rewards to those who bring it. Foolish hunters come to kill her. Most end up serving her. The frost-bitten dead walk here in great numbers.</span>
+    </div>
+    <div class="loc">
+      <span class="locn">Grift</span>
+      <span class="loct">Coastal City. Illegal midnight markets. Heretic Isle Crëlut nearby.</span>
+      <span class="locd">A city of sailors, smugglers, and those who've run out of anywhere else to go. The midnight markets sell things that shouldn't exist. The heretic isle of Crëlut sits two nautical miles east — witches and apostates who flee Galgenbeck's Inquisition end up here.</span>
+    </div>
+    <div class="loc">
+      <span class="locn">Schleswig</span>
+      <span class="loct">The Western Kingdom. Under siege. Burning.</span>
+      <span class="locd">Once powerful. The western fires of psalm 4:3 burn here first. Illegal midnight markets here too, though more dangerous than Grift's. King Sigfúm the Kind ruled here once. Now his heirs argue over who inherits a burning ruin. Refugees flood east along roads full of things that want to eat them.</span>
+    </div>
+  </div>
+  <div class="div"></div>
+  <div class="ch w">Key Figures</div>
+  <div class="rw"><span class="rl">Josilfa Migol</span><span class="rv">Arch-Priestess of Galgenbeck. Ancient. Possibly immortal. Perhaps in league with Nechrubel. The Inquisition obeys her absolutely.</span></div>
+  <div class="rw"><span class="rl">The Shadow King</span><span class="rv">Legend-shrouded. Rules from Graven-Tosk in ruined palace. His line continues in disguise among ordinary people. His servants still wander.</span></div>
+  <div class="rw"><span class="rl">Anthelia</span><span class="rv">Blood Countess of Kergüs. Limestone palace in Alliáns. Seeks warmth and colour. Possibly a vampire. Rewards those who bring beauty to her grey lands.</span></div>
+  <div class="rw"><span class="rl">Anuk Schleger</span><span class="rv">The scribe who recorded the Calendar of Nechrubel after crossing paths with Verhu. The act of writing it may have broken something in him.</span></div>
+</div>
+
+<div class="c c-red">
+  <div class="ch r">Adventure Hooks (d10)</div>
+  <div class="pow-g" style="gap:2px 8px;font-size:10.5px">
+    <span class="pn">1</span><span class="pt">A Wickhead Knave delivered a sealed letter to your door at midnight. It contains your name, your sins, and a time. Tonight.</span>
+    <span class="pn">2</span><span class="pt">The Bergen Chrypt has opened. Treasure gleams in its depths. Two parties have already gone in. Neither came back. A third is forming.</span>
+    <span class="pn">3</span><span class="pt">Something warm is growing in the heart of Sarkash. The forest's creatures are fleeing toward Galgenbeck. All of them. Now.</span>
+    <span class="pn">4</span><span class="pt">A Misery has struck. The Basilisk demands your group perform a task or the misery worsens. Roll on the demands table.</span>
+    <span class="pn">5</span><span class="pt">A prince of the Shadow King's line is living in this town as a merchant. The Shadow King's servants are coming to retrieve him. He'll pay anything to disappear.</span>
+    <span class="pn">6</span><span class="pt">The Inquisition has issued a warrant for a heretical priest. You know where she is. She knows something that could save or doom everything.</span>
+    <span class="pn">7</span><span class="pt">Blood Countess Anthelia wants something that exists in Grift's midnight market. She cannot go herself. She's sent proxies before. None returned.</span>
+    <span class="pn">8</span><span class="pt">A troll has claimed the only bridge over Lake Onda. The refugees pouring from Schleswig are piling up on the wrong side. Winter is days away.</span>
+    <span class="pn">9</span><span class="pt">An Undead Necromancer has raised an army in the Valley of the Unfortunate Undead and is marching on Grift. A bounty stands on the necromancer's head — alive only.</span>
+    <span class="pn">10</span><span class="bt">Psalm 6:1 has come to pass. The sun has set. It has not risen. It will not rise again. You have however many torches you have.</span>
+  </div>
+  <div class="div"></div>
+  <div class="ch r">Dungeon Stocking (per room, d6)</div>
+  <div class="rw"><span class="rl">1–2</span><span class="rv">Empty (but not safe — sounds, drips, wrong smells)</span></div>
+  <div class="rw"><span class="rl">3</span><span class="rv">Monster (roll on bestiary)</span></div>
+  <div class="rw"><span class="rl">4</span><span class="rv">Trap (roll on Traps & Devilry)</span></div>
+  <div class="rw"><span class="rl">5</span><span class="rv">Treasure (roll on Corpse Plundering or Occult Treasures)</span></div>
+  <div class="rw"><span class="rl">6</span><span class="rv">Monster + Treasure (or Trap + clue to something worse)</span></div>
+</div>
+
+<div class="c c-yellow">
+  <div class="ch">Punk is Dead Compatibility</div>
+  <p class="note" style="margin-bottom:4px">Punk is Dead is compatible with Mörk Borg. Key conversions when running cross-system or borrowing creatures:</p>
+  <div class="rw"><span class="rl">RESOLUTION</span><span class="rv">Both: d20 + modifier vs DR. Identical system. No conversion needed.</span></div>
+  <div class="rw"><span class="rl">ABILITIES</span><span class="rv">MB: STR/AGL/PRES/TOUGH ↔ PiD: NNGH/DEFT/STAGE PRES./TOUGH (+ YEET, STREETWISE)</span></div>
+  <div class="rw"><span class="rl">NNGH</span><span class="rv">≈ Strength</span></div>
+  <div class="rw"><span class="rl">DEFT</span><span class="rv">≈ Agility</span></div>
+  <div class="rw"><span class="rl">STAGE PRESENCE</span><span class="rv">≈ Presence</span></div>
+  <div class="rw"><span class="rl">TOUGH</span><span class="rv">≈ Toughness</span></div>
+  <div class="rw"><span class="rl">YEET</span><span class="rv">≈ Agility (ranged only)</span></div>
+  <div class="rw"><span class="rl">STREETWISE</span><span class="rv">≈ Presence or roll-specific Agility</span></div>
+  <div class="rw"><span class="rl">HP</span><span class="rv">Both: TOUGH + hit die. Identical.</span></div>
+  <div class="rw"><span class="rl">ARMOUR</span><span class="rv">Both: damage reduction die. Identical.</span></div>
+  <div class="rw"><span class="rl">MORALE</span><span class="rv">Both: 2d6 vs morale rating. Identical.</span></div>
+  <div class="rw"><span class="rl">CALENDAR</span><span class="rv">Both games use an apocalypse clock (Calendar/Emergency Broadcasts). Run both simultaneously for compounding doom.</span></div>
+  <div class="rw"><span class="rl">CREATURES</span><span class="rv">MB creatures can be used in PiD unchanged — stats are fully compatible. PiD creatures work in MB the same way.</span></div>
+  <div class="rw"><span class="rl">SILVER / QUID</span><span class="rv">1 silver ≈ £1 for cross-system pricing.</span></div>
+  <div class="rw"><span class="rl">SCROLLS / QF</span><span class="rv">MB Scrolls work as special abilities (no direct equivalent in PiD). Quantum Fuckery works as flavourful class features with no MB equivalent — use as-is.</span></div>
+  <div class="omen" style="margin-top:5px"><strong>RUNNING BOTH SIMULTANEOUSLY:</strong> The Ununited Kingdom of Punk is Dead is a post-nuclear Britain. Mörk Borg's dying world is a fantasy medieval nightmare. They could be the same world separated by centuries — or bleeding into each other through Quantum Fuckery. The Literal Corporate Vampires and Galgenbeck's Inquisition have much in common. Both worlds are ending. Both feature apocalypse clocks. Both punish hope.<br><br>A band of punk musicians wandering through a rift into Mörk Borg's territory — or Sarkash creatures stumbling into the Fern Jungle — requires exactly zero mechanical conversion.</div>
+</div>
+</div>`,
+
+};
+
+const TABS = [
+  {id:'core', label:'Core Rules'},
+  {id:'powers', label:'Powers & Scrolls'},
+  {id:'classes', label:'Classes'},
+  {id:'calendar', label:'Calendar & Gods'},
+  {id:'bestiary', label:'Bestiary'},
+  {id:'world', label:'World & Hooks'},
+];
+
+const tc = document.getElementById('tabs');
+const pc = document.getElementById('panels');
+
+TABS.forEach((t,i) => {
+  const b = document.createElement('button');
+  b.className = 'tb' + (i===0?' on':'');
+  b.textContent = t.label;
+  b.onclick = () => {
+    document.querySelectorAll('.tb').forEach(x=>x.classList.remove('on'));
+    document.querySelectorAll('.pnl').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on');
+    document.getElementById('p-'+t.id).classList.add('on');
+  };
+  tc.appendChild(b);
+
+  const p = document.createElement('div');
+  p.className = 'pnl' + (i===0?' on':'');
+  p.id = 'p-'+t.id;
+  p.innerHTML = data[t.id];
+  pc.appendChild(p);
+});
+</script>
